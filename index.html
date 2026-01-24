@@ -19,42 +19,15 @@
             <nav>
                 <button class="menu-toggle" aria-label="Menu">&#9776;</button>
                 <ul class="nav-menu">
-                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="index.html">Inicio</a></li>
                     <li><a href="#informacion">Información</a></li>
                     <li><a href="#contacto">Ubicación</a></li>
-                    <li><button id="openLogin" class="btn-login">Iniciar Sesión</button></li>
+                    <li><a href="iniciar-sesion.html" class="btn-nav-auth">Entrar</a></li>
+                    <li><a href="registrarse.html" class="btn-nav-auth highlight">Registro</a></li>
                 </ul>
             </nav>
         </div>
     </header>
-
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            
-            <div id="loginForm">
-                <h3>Iniciar Sesión</h3>
-                <form id="formSignIn">
-                    <input type="email" id="loginEmail" placeholder="Correo Gmail" required>
-                    <input type="password" id="loginPass" placeholder="Contraseña" required>
-                    <button type="submit" class="btn-principal">Entrar</button>
-                </form>
-                <p>¿No tienes cuenta? <a href="#" id="toRegister">Regístrate aquí</a></p>
-            </div>
-
-            <div id="registerForm" style="display:none;">
-                <h3>Registro de Alumno</h3>
-                <form id="formSignUp">
-                    <input type="text" id="regName" placeholder="Nombre Completo" required>
-                    <input type="email" id="regEmail" placeholder="Correo @gmail.com" required>
-                    <input type="password" id="regPass" placeholder="Crear Contraseña" required>
-                    <button type="submit" class="btn-principal">Crear Cuenta</button>
-                </form>
-                <p>¿Ya tienes cuenta? <a href="#" id="toLogin">Inicia sesión</a></p>
-            </div>
-            <p id="authMessage" style="color: red; margin-top: 10px;"></p>
-        </div>
-    </div>
 
     <main>
         <section id="inicio" class="hero">
@@ -75,9 +48,18 @@
                     </div>
                     <div class="card">
                         <h4>Programas Académicos</h4>
-                        <p>Bachillerato general con especialidad en ciencias y humanidades.</p>
+                        <p>Bachillerato general con especialidad en ciencias y humanidades, talleres deportivos y culturales.</p>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section id="contacto" class="info-section alternate-bg">
+            <div class="container">
+                <h3>Contacto y Ubicación</h3>
+                <p>📍 Calle Lincoln #123, Ciudad de México.</p>
+                <p>📞 Teléfono: (55) 1234-5678</p>
+                <p>📧 Correo: info@abrahamlincoln.edu.mx</p>
             </div>
         </section>
     </main>
