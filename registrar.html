@@ -1,26 +1,30 @@
-<h2>Registro de Estudiantes</h2>
-<form id="registroForm">
-  <input type="text" id="nombre" placeholder="Nombre Completo" required><br>
-  <input type="email" id="email" placeholder="Correo Institucional" required><br>
-  <input type="password" id="contrasena" placeholder="Crea una contraseña" required><br>
-  <button type="submit">Crear cuenta</button>
-</form>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro | Abraham Lincoln</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <img src="imagenes/circuloabraham.png" alt="Logo" class="auth-logo">
+        <h2>Crear Cuenta de Alumno</h2>
+        <p>Usa exclusivamente tu cuenta de @gmail.com</p>
+        
+        <form id="formSignUpPage">
+            <input type="text" id="regName" placeholder="Nombre Completo" required>
+            <input type="email" id="regEmail" placeholder="Correo Gmail" required>
+            <input type="password" id="regPass" placeholder="Contraseña" required>
+            <button type="submit" class="btn-principal">Registrarse</button>
+        </form>
+        
+        <p id="authMessage" style="color: red; margin-top: 10px;"></p>
+        <p>¿Ya tienes cuenta? <a href="iniciar-sesion.html">Inicia sesión aquí</a></p>
+        <hr>
+        <a href="index.html">← Volver al inicio</a>
+    </div>
 
-<script>
-  document.getElementById('registroForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const datos = {
-      nombre: document.getElementById('nombre').value,
-      email: document.getElementById('email').value,
-      contrasena: document.getElementById('contrasena').value
-    };
-
-    const respuesta = await fetch('/api/registrar', {
-      method: 'POST',
-      body: JSON.stringify(datos)
-    });
-
-    const resultado = await respuesta.text();
-    alert(resultado);
-  });
-</script>
+    <script src="script.js"></script>
+</body>
+</html>
