@@ -321,3 +321,83 @@ footer {
         padding: 40px 25px;
     }
 }
+
+/* =======================================================
+   MEJORAS VISUALES GENERALES Y MODAL DE BIENVENIDA
+   ======================================================= */
+
+body {
+    color: var(--texto-oscuro);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Botones más modernos */
+.btn-principal, .btn-auth, .btn-nav-auth {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-principal:hover, .btn-auth:hover, .btn-nav-auth:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+/* Greeting in nav */
+.nav-user .greeting {
+    margin-right: 10px;
+    color: var(--blanco);
+    font-weight: 700;
+}
+
+/* Mejor apariencia de auth container */
+.auth-container {
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.auth-container input {
+    background: #fafafa;
+}
+
+/* Tarjetas y secciones */
+.card h4 { color: var(--azul); }
+
+/* Bienvenida modal */
+.welcome-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+.welcome-modal {
+    background: rgba(255,255,255,0.9);
+    color: var(--texto-oscuro);
+    padding: 28px 26px;
+    border-radius: 12px;
+    max-width: 520px;
+    width: calc(100% - 40px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    text-align: center;
+    backdrop-filter: blur(4px);
+    position: relative;
+    opacity: 0.98;
+}
+.welcome-modal p { font-size: 1rem; line-height: 1.4; }
+.welcome-modal .close-welcome {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #333;
+}
+.welcome-modal .close-welcome:focus { outline: none; }
+
+@media (max-width: 480px) {
+    .welcome-modal { padding: 20px; }
+}
+

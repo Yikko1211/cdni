@@ -148,33 +148,109 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 3. LÓGICA DE LOGIN (Página iniciar-sesion.html) ---
     const formSignInPage = document.getElementById('formSignInPage');
     if (formSignInPage) {
-        formSignInPage.onsubmit = (e) => {
+        formSignInPage.onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPass').value;
             const loginMessage = document.getElementById('loginMessage') || document.getElementById('authMessage');
 
-            const accounts = getAccounts();
-            if (accounts.length === 0) {
-                // No hay cuentas guardadas: aceptar login y crear sesión mínima
-                const nameGuess = email.split('@')[0] || 'Usuario';
-                setCurrentUser({ name: nameGuess, email });
-                window.location.href = 'index.html';
-                return;
-            }
+            // Intentar autenticar contra backend (Cloudflare D1)
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
 
-            const match = accounts.find(a => a.email.toLowerCase() === email.toLowerCase() && a.password === password);
-            if (match) {
-                setCurrentUser({ name: match.name, email: match.email });
-                window.location.href = 'index.html';
-            } else {
-                if (loginMessage) {
-                    loginMessage.textContent = 'Usuario o contraseña incorrectos.';
-                    loginMessage.style.color = 'red';
+                const result = await response.json().catch(() => ({}));
+                if (response.ok) {
+                    // backend devolvió nombre y correo
+                    setCurrentUser({ name: result.name || (email.split('@')[0]), email: result.email || email });
+                    window.location.href = 'index.html';
+                    return;
                 } else {
-                    alert('Usuario o contraseña incorrectos.');
+                    if (loginMessage) {
+                        loginMessage.textContent = result.error || 'Usuario o contraseña incorrectos.';
+                        loginMessage.style.color = 'red';
+                    } else {
+                        alert(result.error || 'Usuario o contraseña incorrectos.');
+                    }
+                    return;
+                }
+            } catch (err) {
+                // Fallback: si no funciona el backend, usar cuentas locales
+                const accounts = getAccounts();
+                if (accounts.length === 0) {
+                    const nameGuess = email.split('@')[0] || 'Usuario';
+                    setCurrentUser({ name: nameGuess, email });
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const match = accounts.find(a => a.email.toLowerCase() === email.toLowerCase() && a.password === password);
+                if (match) {
+                    setCurrentUser({ name: match.name, email: match.email });
+                    window.location.href = 'index.html';
+                } else {
+                    if (loginMessage) {
+                        loginMessage.textContent = 'Usuario o contraseña incorrectos.';
+                        loginMessage.style.color = 'red';
+                    } else {
+                        alert('Usuario o contraseña incorrectos.');
+                    }
                 }
             }
         };
     }
+
+    // --- 4. MODAL DE BIENVENIDA (FIRST VISIT) ---
+    function showWelcomeIfFirstVisit() {
+        try {
+            const key = 'cdniSeenWelcome';
+            if (localStorage.getItem(key)) return;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'welcome-overlay';
+
+            const modal = document.createElement('div');
+            modal.className = 'welcome-modal';
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'close-welcome';
+            closeBtn.setAttribute('aria-label', 'Cerrar');
+            closeBtn.innerHTML = '✕';
+
+            const p = document.createElement('p');
+            p.innerHTML = 'Sitio web creado por estudiante <strong>Zaid Xavier Badillo Lopez</strong> de <strong>6A</strong>';
+            p.style.opacity = '0.95';
+
+            modal.appendChild(closeBtn);
+            modal.appendChild(p);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            function closeWelcome() {
+                try { localStorage.setItem(key, '1'); } catch (e) {}
+                overlay.remove();
+            }
+
+            closeBtn.addEventListener('click', closeWelcome);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeWelcome();
+            });
+
+            // Allow Esc to close
+            document.addEventListener('keydown', function escHandler(e) {
+                if (e.key === 'Escape') {
+                    closeWelcome();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            });
+        } catch (e) {
+            // ignore failures in storage
+        }
+    }
+
+    // Ejecutar modal después de una pequeña espera para que la carga se vea suave
+    setTimeout(showWelcomeIfFirstVisit, 600);
 });
