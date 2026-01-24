@@ -1,3 +1,4 @@
+/* --- TU CÓDIGO BASE (Mantenido) --- */
 :root {
     --amarillo: #FFD700;
     --azul: #000080;
@@ -16,7 +17,6 @@ body {
 
 .container { width: 90%; max-width: 1100px; margin: 0 auto; }
 
-/* HEADER */
 header {
     background: var(--azul);
     color: var(--blanco);
@@ -33,33 +33,17 @@ header .container {
     align-items: center; 
 }
 
-.logo-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+.logo-wrapper { display: flex; align-items: center; gap: 10px; }
+.nav-logo { height: 40px; width: auto; }
+header h1 { color: var(--amarillo); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
 
-.nav-logo {
-    height: 40px; /* Tamaño pequeño y elegante */
-    width: auto;
-}
-
-header h1 { 
-    color: var(--amarillo); 
-    font-size: 1.2rem; 
-    text-transform: uppercase; 
-    letter-spacing: 1px;
-}
-
-/* NAVEGACIÓN */
-.nav-menu { list-style: none; display: flex; }
+.nav-menu { list-style: none; display: flex; align-items: center; }
 .nav-menu li { margin-left: 20px; }
 .nav-menu a { color: white; text-decoration: none; font-weight: bold; font-size: 0.85rem; transition: 0.3s; }
 .nav-menu a:hover { color: var(--amarillo); }
 
 .menu-toggle { display: none; background: none; border: none; color: var(--amarillo); font-size: 1.8rem; cursor: pointer; }
 
-/* HERO SECTION */
 .hero {
     background: linear-gradient(rgba(0,0,128,0.8), rgba(0,0,128,0.8)), url('https://images.unsplash.com/photo-1523050853063-bd8012fec059?auto=format&fit=crop&w=1200&q=80');
     background-size: cover;
@@ -81,79 +65,71 @@ header h1 {
     font-weight: bold;
     border-radius: 5px;
     margin-top: 25px;
+    cursor: pointer;
+    border: none;
 }
 
-/* SECCIONES */
 .info-section { padding: 60px 0; text-align: center; }
 .info-section h3 { margin-bottom: 30px; font-size: 2rem; color: var(--azul); }
-
 .oferta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-
-.card { 
-    background: white; 
-    padding: 30px; 
-    border-radius: 8px; 
-    border-top: 6px solid var(--amarillo); 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-}
-
+.card { background: white; padding: 30px; border-radius: 8px; border-top: 6px solid var(--amarillo); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 .alternate-bg { background: var(--azul); color: white; }
 .alternate-bg h3 { color: var(--amarillo); }
-
 footer { background: #111; color: white; text-align: center; padding: 25px 0; border-top: 3px solid var(--amarillo); font-size: 0.9rem; }
 
-/* MÓVIL */
-@media (max-width: 768px) {
-    .nav-menu { display: none; }
-    .menu-toggle { display: block; }
-    header h1 { font-size: 1rem; }
-    .nav-logo { height: 35px; }
-    .hero h2 { font-size: 1.8rem; }
+/* --- NUEVOS ESTILOS AGREGADOS --- */
+
+/* Botones de navegación específicos */
+.btn-nav-auth {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--amarillo);
+}
+.btn-nav-auth.highlight {
+    background-color: var(--amarillo);
+    color: var(--azul) !important;
 }
 
-/* BOTÓN LOGIN EN NAV */
-.btn-login {
-    background: var(--amarillo);
-    color: var(--azul);
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
+/* Páginas de Login y Registro */
+.auth-page {
+    background-color: var(--azul);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
 }
 
-/* VENTANA MODAL */
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.6);
-}
-
-.modal-content {
-    background-color: white;
-    margin: 10% auto;
-    padding: 30px;
-    width: 90%;
-    max-width: 400px;
-    border-radius: 10px;
-    text-align: center;
-    position: relative;
-}
-
-.modal-content input {
+.auth-container {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    max-width: 400px;
+    text-align: center;
 }
 
-.close-btn {
-    position: absolute;
-    right: 15px; top: 10px;
-    font-size: 25px;
-    cursor: pointer;
+.auth-logo { height: 70px; margin-bottom: 15px; }
+
+.auth-container h2 { color: var(--azul); margin-bottom: 10px; }
+
+.auth-container input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.auth-container a { color: var(--azul); font-weight: bold; text-decoration: none; }
+
+.auth-container hr { margin: 20px 0; border: 0; border-top: 1px solid #eee; }
+
+@media (max-width: 768px) {
+    .nav-menu { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: var(--azul); padding: 20px; }
+    .nav-menu.active { display: flex; }
+    .nav-menu li { margin: 10px 0; }
+    .menu-toggle { display: block; }
 }
