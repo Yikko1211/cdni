@@ -110,3 +110,50 @@ footer { background: #111; color: white; text-align: center; padding: 25px 0; bo
     .nav-logo { height: 35px; }
     .hero h2 { font-size: 1.8rem; }
 }
+
+/* BOTÓN LOGIN EN NAV */
+.btn-login {
+    background: var(--amarillo);
+    color: var(--azul);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* VENTANA MODAL */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.close-btn {
+    position: absolute;
+    right: 15px; top: 10px;
+    font-size: 25px;
+    cursor: pointer;
+}
