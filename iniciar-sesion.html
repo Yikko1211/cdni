@@ -6,36 +6,48 @@
     <title>Login | Abraham Lincoln</title>
     <meta name="description" content="Inicia sesión en Preparatoria Abraham Lincoln para acceder a recursos y servicios escolares.">
     <meta name="theme-color" content="#000080">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="imagenes/circuloabraham.png" type="image/png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="auth-page">
 
     <div class="auth-container">
-        <div class="auth-header-logo">
-            <img src="imagenes/circuloabraham.png" alt="Logo" class="auth-logo-img" loading="lazy">
-            <div class="logo-text-split">
-                <span class="text-yellow">Abraham</span> <span class="text-blue">Lincoln</span>
+        <div class="auth-wrapper">
+            <div class="auth-hero">
+                <img src="imagenes/circuloabraham.png" alt="Logo" class="auth-hero-logo" loading="lazy">
+                <h3>Bienvenido de nuevo</h3>
+                <p>Ingresa tus credenciales para acceder al portal escolar.</p>
+            </div>
+
+            <div class="auth-form">
+                <div class="auth-header-logo small">
+                    <div class="logo-text-split">
+                        <span class="text-yellow">Abraham</span> <span class="text-blue">Lincoln</span>
+                    </div>
+                </div>
+
+                <h2>Iniciar sesión</h2>
+                <p class="muted">Ingresa tus credenciales para continuar.</p>
+
+                <form id="formSignInPage">
+                    <div class="form-group">
+                        <input name="email" type="email" id="loginEmail" placeholder="Tu correo electrónico" required autocomplete="email">
+                    </div>
+                    <div class="form-group password-group">
+                        <input name="password" type="password" id="loginPass" placeholder="Tu contraseña" required autocomplete="current-password">
+                        <button type="button" class="pw-toggle" aria-label="Mostrar contraseña">👁️</button>
+                    </div>
+
+                    <button type="submit" class="btn-auth">Entrar al portal</button>
+                </form>
+
+                <p id="loginMessage" class="form-note"></p>
+
+                <p class="muted">¿Eres nuevo aquí? <a href="registrarse.html">Crea una cuenta</a></p>
+                <a href="index.html" class="back-link">← Volver al inicio</a>
             </div>
         </div>
-        
-        <h2 style="text-align: left; color: #333; margin-bottom: 5px;">Bienvenido</h2>
-        <p style="text-align: left; color: #777; font-size: 0.9rem; margin-bottom: 25px;">Ingresa tus credenciales para continuar.</p>
-
-        <form id="formSignInPage">
-            <input name="email" type="email" id="loginEmail" placeholder="Tu correo electrónico" required autocomplete="email">
-            <input name="password" type="password" id="loginPass" placeholder="Tu contraseña" required autocomplete="current-password">
-            
-            <button type="submit" class="btn-auth">Entrar al portal</button>
-        </form>
-
-        <p id="loginMessage" style="margin-top: 15px; font-size: 0.85rem; color: red;"></p>
-
-        <p style="margin-top: 25px; font-size: 0.9rem; color: #555;">
-            ¿Eres nuevo aquí? <a href="registrarse.html" style="color: var(--azul); font-weight: bold;">Crea una cuenta</a>
-        </p>
-        
-        <a href="index.html" style="display: block; margin-top: 20px; font-size: 0.8rem; color: #aaa; text-decoration: none;">← Volver al inicio</a>
     </div>
 
     <script src="script.js"></script>

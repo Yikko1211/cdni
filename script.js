@@ -253,4 +253,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ejecutar modal después de una pequeña espera para que la carga se vea suave
     setTimeout(showWelcomeIfFirstVisit, 600);
+
+    // --- 5. PASSWORD TOGGLE + STRENGTH ---
+    function initPasswordToggles() {
+        const toggles = document.querySelectorAll('.pw-toggle');
+        toggles.forEach(btn => {
+            const group = btn.closest('.password-group');
+            if (!group) return;
+            const input = group.querySelector('input[type="password"], input[type="text"]');
+            if (!input) return;
+
+            btn.addEventListener('click', () => {
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                btn.textContent = isPassword ? '🙈' : '👁️';
+            });
+
+            // Strength indicator for register page
+            if (input.id === 'regPass') {
+                const strengthEl = document.getElementById('pwStrength');
+                input.addEventListener('input', () => {
+                    const v = input.value || '';
+                    const score = Math.min(4, Math.floor(v.length / 4));
+                    const labels = ['Muy débil', 'Débil', 'Aceptable', 'Buena', 'Fuerte'];
+                    if (strengthEl) {
+                        strengthEl.textContent = v.length ? `Contraseña: ${labels[score]}` : '';
+                        strengthEl.style.color = score < 2 ? 'crimson' : (score < 3 ? 'orange' : 'green');
+                    }
+                });
+            }
+        });
+    }
+
+    initPasswordToggles();
 });
