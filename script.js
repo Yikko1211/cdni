@@ -21,18 +21,92 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2. LÓGICA DE REGISTRO (Página registrarse.html) ---
+    const ACCOUNTS_KEY = 'cdniAccounts';
+    const USER_KEY = 'cdniUser';
+
+    function getAccounts() {
+        try {
+            return JSON.parse(localStorage.getItem(ACCOUNTS_KEY)) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveAccounts(accounts) {
+        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+    }
+
+    function setCurrentUser(user) {
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+        updateUIForAuth();
+    }
+
+    function getCurrentUser() {
+        try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch (e) { return null; }
+    }
+
+    function logout() {
+        localStorage.removeItem(USER_KEY);
+        updateUIForAuth();
+    }
+
+    function escapeHtml(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+
+    function updateUIForAuth() {
+        const navMenu = document.querySelector('.nav-menu');
+        if (!navMenu) return;
+        const user = getCurrentUser();
+
+        // Remove any existing .nav-user placeholder
+        const existing = navMenu.querySelector('.nav-user');
+        if (existing) existing.remove();
+
+        // Hide original auth links if logged in
+        if (user) {
+            const authLinks = Array.from(navMenu.querySelectorAll('a.btn-nav-auth'));
+            authLinks.forEach(a => a.remove());
+
+            const li = document.createElement('li');
+            li.className = 'nav-user';
+            li.innerHTML = `<span class="greeting">Hola, ${escapeHtml(user.name)}</span> <button id="logoutBtn" class="btn-nav-auth" aria-label="Cerrar sesión">Cerrar sesión</button>`;
+            navMenu.appendChild(li);
+
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) logoutBtn.addEventListener('click', () => { logout(); });
+        } else {
+            // If not logged, ensure auth links exist (restore if they were removed)
+            if (!navMenu.querySelector('a[href="iniciar-sesion.html"]')) {
+                const liLogin = document.createElement('li');
+                liLogin.innerHTML = '<a href="iniciar-sesion.html" class="btn-nav-auth">Entrar</a>';
+                const liReg = document.createElement('li');
+                liReg.innerHTML = '<a href="registrarse.html" class="btn-nav-auth highlight">Registro</a>';
+                navMenu.appendChild(liLogin);
+                navMenu.appendChild(liReg);
+            }
+        }
+    }
+
+    updateUIForAuth();
+
     const formSignUpPage = document.getElementById('formSignUpPage');
     if (formSignUpPage) {
         formSignUpPage.onsubmit = async (e) => {
             e.preventDefault();
             const authMessage = document.getElementById('authMessage');
-            const email = document.getElementById('regEmail').value;
-            const nombre = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value.trim();
+            const nombre = document.getElementById('regName').value.trim();
             const password = document.getElementById('regPass').value;
 
-            // Verificador de Gmail
             if (!email.toLowerCase().endsWith('@gmail.com')) {
                 authMessage.textContent = "Error: Debes usar una cuenta de @gmail.com";
+                authMessage.style.color = "red";
+                return;
+            }
+
+            if (password.length < 8) {
+                authMessage.textContent = "La contraseña debe tener al menos 8 caracteres.";
                 authMessage.style.color = "red";
                 return;
             }
@@ -47,17 +121,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' }
                 });
 
-                const result = await response.json();
+                const result = await response.json().catch(() => ({}));
 
                 if (response.ok) {
-                    alert("¡Registro exitoso! Bienvenido a la Abraham Lincoln.");
-                    window.location.href = "iniciar-sesion.html";
+                    // backend accepted: store local copy and set current user
+                    const accounts = getAccounts();
+                    accounts.push({ name: nombre, email, password });
+                    saveAccounts(accounts);
+                    setCurrentUser({ name: nombre, email });
+                    window.location.href = 'index.html';
                 } else {
                     authMessage.textContent = result.error || "Hubo un error al registrar.";
                     authMessage.style.color = "red";
                 }
             } catch (error) {
-                authMessage.textContent = "Error de conexión con el servidor.";
+                // Fallback: no backend — create local account so user can log in locally
+                const accounts = getAccounts();
+                accounts.push({ name: nombre, email, password });
+                saveAccounts(accounts);
+                setCurrentUser({ name: nombre, email });
+                window.location.href = 'index.html';
             }
         };
     }
@@ -67,9 +150,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if (formSignInPage) {
         formSignInPage.onsubmit = (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            // Aquí agregarás la lógica de autenticación real más adelante
-            alert("Verificando datos para: " + email);
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPass').value;
+            const loginMessage = document.getElementById('loginMessage') || document.getElementById('authMessage');
+
+            const accounts = getAccounts();
+            if (accounts.length === 0) {
+                // No hay cuentas guardadas: aceptar login y crear sesión mínima
+                const nameGuess = email.split('@')[0] || 'Usuario';
+                setCurrentUser({ name: nameGuess, email });
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const match = accounts.find(a => a.email.toLowerCase() === email.toLowerCase() && a.password === password);
+            if (match) {
+                setCurrentUser({ name: match.name, email: match.email });
+                window.location.href = 'index.html';
+            } else {
+                if (loginMessage) {
+                    loginMessage.textContent = 'Usuario o contraseña incorrectos.';
+                    loginMessage.style.color = 'red';
+                } else {
+                    alert('Usuario o contraseña incorrectos.');
+                }
+            }
         };
     }
 });
