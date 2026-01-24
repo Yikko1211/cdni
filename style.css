@@ -10,6 +10,28 @@
     --sombra: 0 10px 25px rgba(0,0,0,0.1);
 }
 
+/* Enlace para saltar al contenido (accesibilidad) */
+.skip-link {
+    position: absolute;
+    left: -999px;
+    top: -999px;
+    background: var(--amarillo);
+    color: var(--azul);
+    padding: 8px 12px;
+    z-index: 999;
+}
+.skip-link:focus {
+    left: 12px;
+    top: 12px;
+    border-radius: 6px;
+}
+
+/* Mejora de foco para accesibilidad */
+:focus-visible {
+    outline: 3px solid var(--amarillo);
+    outline-offset: 3px;
+}
+
 * { 
     margin: 0; 
     padding: 0; 

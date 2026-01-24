@@ -6,7 +6,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (menuToggle && navMenu) {
         menuToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
+            const isActive = navMenu.classList.toggle('active');
+            menuToggle.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+        });
+
+        // Cerrar menú con Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+                menuToggle.focus();
+            }
         });
     }
 

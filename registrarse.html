@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro | Abraham Lincoln</title>
+    <meta name="description" content="Crear cuenta en Preparatoria Abraham Lincoln. Inscríbete y accede a recursos educativos.">
+    <meta name="theme-color" content="#000080">
     <link rel="icon" href="imagenes/circuloabraham.png" type="image/png">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,7 +13,7 @@
 
     <div class="auth-container">
         <div class="auth-header-logo">
-            <img src="imagenes/circuloabraham.png" alt="Logo" class="auth-logo-img">
+            <img src="imagenes/circuloabraham.png" alt="Logo" class="auth-logo-img" loading="lazy">
             <div class="logo-text-split">
                 <span class="text-yellow">Abraham</span> <span class="text-blue">Lincoln</span>
             </div>
@@ -21,9 +23,9 @@
         <p style="text-align: left; color: #777; font-size: 0.9rem; margin-bottom: 25px;">Únete a nuestra comunidad educativa.</p>
 
         <form id="formSignUpPage">
-            <input type="text" id="regName" placeholder="Nombre completo" required>
-            <input type="email" id="regEmail" placeholder="Correo electrónico @gmail.com" required>
-            <input type="password" id="regPass" placeholder="Contraseña segura" required>
+            <input name="nombre" type="text" id="regName" placeholder="Nombre completo" required autocomplete="name">
+            <input name="email" type="email" id="regEmail" placeholder="Correo electrónico @gmail.com" required autocomplete="email">
+            <input name="password" type="password" id="regPass" placeholder="Contraseña segura" required minlength="8" autocomplete="new-password">
             
             <button type="submit" class="btn-auth">Registrarse ahora</button>
         </form>

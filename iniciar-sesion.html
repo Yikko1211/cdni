@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Abraham Lincoln</title>
+    <meta name="description" content="Inicia sesión en Preparatoria Abraham Lincoln para acceder a recursos y servicios escolares.">
+    <meta name="theme-color" content="#000080">
     <link rel="icon" href="imagenes/circuloabraham.png" type="image/png">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,7 +13,7 @@
 
     <div class="auth-container">
         <div class="auth-header-logo">
-            <img src="imagenes/circuloabraham.png" alt="Logo" class="auth-logo-img">
+            <img src="imagenes/circuloabraham.png" alt="Logo" class="auth-logo-img" loading="lazy">
             <div class="logo-text-split">
                 <span class="text-yellow">Abraham</span> <span class="text-blue">Lincoln</span>
             </div>
@@ -21,8 +23,8 @@
         <p style="text-align: left; color: #777; font-size: 0.9rem; margin-bottom: 25px;">Ingresa tus credenciales para continuar.</p>
 
         <form id="formSignInPage">
-            <input type="email" id="loginEmail" placeholder="Tu correo electrónico" required>
-            <input type="password" id="loginPass" placeholder="Tu contraseña" required>
+            <input name="email" type="email" id="loginEmail" placeholder="Tu correo electrónico" required autocomplete="email">
+            <input name="password" type="password" id="loginPass" placeholder="Tu contraseña" required autocomplete="current-password">
             
             <button type="submit" class="btn-auth">Entrar al portal</button>
         </form>
