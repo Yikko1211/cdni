@@ -1,1 +1,303 @@
-test
+/* Variables de Colores */
+:root {
+    --color-principal: #FFD700; /* Amarillo Oro para la Preparatoria */
+    --color-secundario: #000080; /* Azul Marino */
+    --color-texto: #333;
+    --color-claro: #f4f4f4;
+    --color-oscuro: #222;
+}
+
+/* Reseteo Básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: var(--color-texto);
+    background: var(--color-claro);
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+    overflow: hidden; /* Limpia floats */
+    padding: 20px 0;
+}
+
+/* Header */
+header {
+    background: var(--color-secundario); /* Fondo Azul Marino */
+    color: #fff;
+    padding: 1rem 0;
+    border-bottom: 5px solid var(--color-principal); /* Borde Inferior Amarillo */
+}
+
+header h1 {
+    float: left;
+    margin: 0;
+    padding: 0;
+    color: var(--color-principal); /* Título en Amarillo */
+}
+
+header nav {
+    float: right;
+    margin-top: 10px;
+}
+
+header ul {
+    list-style: none;
+}
+
+header ul li {
+    display: inline;
+    padding: 0 15px;
+}
+
+header a {
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+header a:hover {
+    color: var(--color-principal); /* Amarillo al pasar el mouse */
+}
+
+/* Botón de Menú Móvil (inicialmente oculto en desktop) */
+.menu-toggle {
+    display: none; /* Ocultar por defecto */
+    background: var(--color-principal);
+    color: var(--color-secundario);
+    border: none;
+    padding: 10px 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Hero Section (Sección principal de bienvenida) */
+.hero {
+    min-height: 400px;
+    background: var(--color-principal); /* Fondo Amarillo */
+    color: var(--color-secundario); /* Texto Azul Marino */
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.hero h2 {
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* Botón Principal */
+.btn-principal {
+    display: inline-block;
+    color: var(--color-principal); /* Texto Amarillo */
+    background: var(--color-secundario); /* Fondo Azul Marino */
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s ease, color 0.3s ease;
+    border: 2px solid var(--color-secundario);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-principal:hover {
+    background: var(--color-principal); /* Fondo Amarillo */
+    color: var(--color-secundario); /* Texto Azul Marino */
+    border: 2px solid var(--color-principal);
+}
+
+/* Secciones de Información */
+.info-section {
+    padding: 40px 0;
+    text-align: center;
+}
+
+.info-section h3 {
+    color: var(--color-secundario);
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.info-section p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.info-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info-section ul li {
+    background: #fff;
+    margin: 10px auto;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 600px;
+    color: var(--color-texto);
+    text-align: left;
+}
+
+.alternate-bg {
+    background: var(--color-secundario); /* Fondo Azul Marino */
+    color: #fff; /* Texto Blanco */
+}
+
+.alternate-bg h3 {
+    color: var(--color-principal); /* Título Amarillo */
+}
+
+.alternate-bg p, .alternate-bg li {
+    color: #fff; /* Asegura que el texto sea blanco */
+}
+
+/* Imágenes */
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Formulario de Contacto */
+form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+form input[type="text"],
+form input[type="email"],
+form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+form textarea {
+    resize: vertical; /* Permite redimensionar verticalmente */
+}
+
+form button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+}
+
+/* Footer */
+footer {
+    background: var(--color-oscuro);
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 30px;
+}
+
+footer .social-links a {
+    color: var(--color-principal);
+    margin: 0 10px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer .social-links a:hover {
+    color: #fff;
+}
+
+/* --- Media Queries para Responsividad (Móviles) --- */
+@media (max-width: 768px) {
+    header h1 {
+        float: none;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    header nav {
+        float: none;
+        text-align: center;
+    }
+
+    header ul {
+        display: none; /* Oculta el menú por defecto en móviles */
+        flex-direction: column;
+        width: 100%;
+        background: var(--color-secundario);
+        position: absolute; /* Para que ocupe todo el ancho bajo el header */
+        left: 0;
+        top: 60px; /* Ajusta según la altura de tu header */
+        padding-bottom: 10px;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        z-index: 1000;
+    }
+
+    header ul.active {
+        display: flex; /* Muestra el menú cuando esté activo */
+    }
+
+    header ul li {
+        display: block;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    header ul li:last-child {
+        border-bottom: none;
+    }
+
+    .menu-toggle {
+        display: block; /* Muestra el botón de menú en móviles */
+        float: right;
+        margin-top: -55px; /* Ajusta para que quede a la derecha del título */
+        margin-right: 5%;
+        position: relative;
+        z-index: 1001;
+    }
+
+    .hero h2 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .info-section h3 {
+        font-size: 2rem;
+    }
+
+    .info-section p {
+        font-size: 1rem;
+    }
+}
