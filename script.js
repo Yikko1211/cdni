@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. Lógica para el menú de navegación móvil ---
+    // --- 1. MENÚ MÓVIL ---
     const menuToggle = document.querySelector('.menu-toggle');
     const navMenu = document.querySelector('.nav-menu');
 
@@ -8,79 +8,43 @@ document.addEventListener('DOMContentLoaded', () => {
         menuToggle.addEventListener('click', () => {
             navMenu.classList.toggle('active');
         });
+    }
 
-        document.addEventListener('click', (event) => {
-            if (!navMenu.contains(event.target) && !menuToggle.contains(event.target) && navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
+    // --- 2. LÓGICA DE REGISTRO (Página registrarse.html) ---
+    const formSignUpPage = document.getElementById('formSignUpPage');
+    if (formSignUpPage) {
+        formSignUpPage.onsubmit = async (e) => {
+            e.preventDefault();
+            const authMessage = document.getElementById('authMessage');
+            const email = document.getElementById('regEmail').value;
+            const nombre = document.getElementById('regName').value;
+            const password = document.getElementById('regPass').value;
+
+            // Verificador de Gmail
+            if (!email.toLowerCase().endsWith('@gmail.com')) {
+                authMessage.textContent = "Error: Debes usar una cuenta de @gmail.com";
+                authMessage.style.color = "red";
+                return;
             }
-        });
-    }
 
-    // --- 2. Lógica para el botón "Conoce más" / "Saber más" ---
-    const btnPrincipal = document.querySelector('.btn-principal');
-    if (btnPrincipal) {
-        btnPrincipal.addEventListener('click', (e) => {
-            // Si el botón está dentro del Hero, hace scroll a información
-            const target = document.querySelector('#informacion') || document.querySelector('#nosotros');
-            if(target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-    }
-
-    // --- 3. Lógica para el Modal de Login y Registro ---
-    const modal = document.getElementById('authModal');
-    const btnOpen = document.getElementById('openLogin');
-    const btnClose = document.querySelector('.close-btn');
-    const toRegister = document.getElementById('toRegister');
-    const toLogin = document.getElementById('toLogin');
-    const authMessage = document.getElementById('authMessage');
-
-    if (btnOpen && modal) {
-        btnOpen.onclick = () => modal.style.display = "block";
-        btnClose.onclick = () => modal.style.display = "none";
-
-        toRegister.onclick = (e) => {
-            e.preventDefault();
-            document.getElementById('loginForm').style.display = "none";
-            document.getElementById('registerForm').style.display = "block";
-        }
-        toLogin.onclick = (e) => {
-            e.preventDefault();
-            document.getElementById('registerForm').style.display = "none";
-            document.getElementById('loginForm').style.display = "block";
-        }
-    }
-
-    // --- 4. Conexión con la API (functions/api/registrar.js) ---
-    const formSignUp = document.getElementById('formSignUp');
-    if (formSignUp) {
-        formSignUp.onsubmit = async (e) => {
-            e.preventDefault();
-            authMessage.textContent = "Procesando...";
-            
-            const datos = {
-                nombre: document.getElementById('regName').value,
-                email: document.getElementById('regEmail').value,
-                password: document.getElementById('regPass').value
-            };
+            authMessage.textContent = "Procesando registro...";
+            authMessage.style.color = "blue";
 
             try {
-                // Enviamos los datos al archivo que creaste en functions/api/
-                const respuesta = await fetch('/api/registrar', {
+                const response = await fetch('/api/registrar', {
                     method: 'POST',
-                    body: JSON.stringify(datos),
+                    body: JSON.stringify({ nombre, email, password }),
                     headers: { 'Content-Type': 'application/json' }
                 });
 
-                const resultado = await respuesta.json();
+                const result = await response.json();
 
-                if (respuesta.ok) {
-                    alert("¡Registro exitoso! Ya puedes iniciar sesión.");
-                    toLogin.click();
+                if (response.ok) {
+                    alert("¡Registro exitoso! Bienvenido a la Abraham Lincoln.");
+                    window.location.href = "iniciar-sesion.html";
                 } else {
-                    // Aquí aparecerá el error si no es @gmail.com
-                    authMessage.textContent = resultado.error || "Error al registrar.";
+                    authMessage.textContent = result.error || "Hubo un error al registrar.";
+                    authMessage.style.color = "red";
                 }
             } catch (error) {
                 authMessage.textContent = "Error de conexión con el servidor.";
@@ -88,19 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // --- 5. Lógica para el formulario de contacto ---
-    const contactForm = document.getElementById('contact-form');
-    const formMessage = document.querySelector('.form-message');
-
-    if (contactForm && formMessage) {
-        contactForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            formMessage.textContent = '¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.';
-            formMessage.style.display = 'block';
-            formMessage.style.color = 'green';
-            formMessage.style.marginTop = '15px';
-            contactForm.reset();
-            setTimeout(() => { formMessage.style.display = 'none'; }, 5000);
-        });
+    // --- 3. LÓGICA DE LOGIN (Página iniciar-sesion.html) ---
+    const formSignInPage = document.getElementById('formSignInPage');
+    if (formSignInPage) {
+        formSignInPage.onsubmit = (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            // Aquí agregarás la lógica de autenticación real más adelante
+            alert("Verificando datos para: " + email);
+        };
     }
 });
