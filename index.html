@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preparatoria Abraham Lincoln - Excelencia Académica</title>
+    <title>Preparatoria Abraham Lincoln | Tigres Lincoln</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Lincoln_Memorial_Statue_-_Lincoln_National_Memorial_-_Washington%2C_DC_-_20070527.jpg/32px-Lincoln_Memorial_Statue_-_Lincoln_National_Memorial_-_Washington%2C_DC_-_20070527.jpg" type="image/x-icon">
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/b/b5/Abraham_Lincoln_-_November_1863.jpg">
 </head>
 <body>
 
     <header>
         <div class="container">
-            <h1>Preparatoria Abraham Lincoln</h1>
+            <h1>Tigres Lincoln</h1>
             <nav>
                 <button class="menu-toggle" aria-label="Abrir menú">&#9776;</button>
                 <ul class="nav-menu">
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#nosotros">Nosotros</a></li>
-                    <li><a href="#oferta">Oferta Educativa</a></li>
-                    <li><a href="#contacto">Contacto</a></li>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="nosotros.html">Nosotros</a></li>
+                    <li><a href="oferta.html">Oferta Educativa</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
                 </ul>
             </nav>
         </div>
@@ -27,52 +27,58 @@
     <main>
         <section id="inicio" class="hero">
             <div class="container">
-                <h2>Formando Líderes del Mañana</h2>
-                <p>¡Bienvenidos a la Preparatoria Abraham Lincoln! Donde el futuro comienza hoy.</p>
-                <button class="btn-principal">Conoce más</button>
+                <h2>FORMANDO LÍDERES DEL MAÑANA</h2>
+                <p>¡Bienvenidos a la Preparatoria Abraham Lincoln! Donde la excelencia académica y el espíritu de los Tigres se encuentran.</p>
+                <a href="oferta.html" class="btn-principal">Ver Bachilleratos</a>
             </div>
         </section>
 
-        <section id="nosotros" class="info-section">
+        <section class="info-section">
             <div class="container">
-                <h3>Nuestra Historia y Misión</h3>
-                <p>Desde nuestra fundación, nos dedicamos a ofrecer una educación de calidad que inspira a nuestros estudiantes a alcanzar su máximo potencial. Con un enfoque en la innovación y los valores cívicos, preparamos a la próxima generación para los desafíos del mundo.</p>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Abraham_Lincoln_-_November_1863.jpg" alt="Abraham Lincoln Joven" class="img-responsive">
+                <h3>Avisos Recientes</h3>
+                <div class="oferta-grid">
+                    <div class="card">
+                        <h4>Inscripciones Abiertas</h4>
+                        <p>Inicia tu proceso de admisión para el ciclo escolar 2024. ¡Únete a la manada!</p>
+                    </div>
+                    <div class="card">
+                        <h4>Logro Deportivo</h4>
+                        <p>Nuestros Tigres ganaron el primer lugar en el torneo regional de fútbol.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Taller de Robótica</h4>
+                        <p>Nueva convocatoria para el club de tecnología este viernes.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section id="oferta" class="info-section alternate-bg">
+        <section class="info-section alternate-bg">
             <div class="container">
-                <h3>Oferta Educativa</h3>
-                <ul>
-                    <li>Bachillerato General</li>
-                    <li>Talleres de Robótica y Programación</li>
-                    <li>Clubes Deportivos y Culturales</li>
-                    <li>Preparación para Universidades Nacionales e Internacionales</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="contacto" class="info-section">
-            <div class="container">
-                <h3>Contáctanos</h3>
-                <p>¿Tienes preguntas? ¡Estamos aquí para ayudarte!</p>
-                <form id="contact-form">
-                    <input type="text" placeholder="Tu Nombre" required>
-                    <input type="email" placeholder="Tu Correo Electrónico" required>
-                    <textarea placeholder="Tu Mensaje" rows="5" required></textarea>
-                    <button type="submit" class="btn-principal">Enviar Mensaje</button>
-                </form>
-                <p class="form-message" style="display:none;"></p>
+                <h3>¿Por qué elegir Lincoln?</h3>
+                <div class="container" style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <img src="https://images.unsplash.com/photo-1523050853063-bd8012fec059?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80" alt="Estudiantes" class="img-responsive">
+                    </div>
+                    <div style="flex: 1; min-width: 250px; text-align: left; padding: 20px;">
+                        <p>Ofrecemos un ambiente seguro, tecnología de punta y un cuerpo docente altamente calificado. En la Preparatoria Abraham Lincoln, nos enfocamos en el desarrollo integral de cada alumno.</p>
+                        <ul>
+                            <li>✅ Inglés Intensivo</li>
+                            <li>✅ Laboratorios de Ciencias</li>
+                            <li>✅ Convenios Universitarios</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
     <footer>
         <div class="container">
-            <p>&copy; 2023 Preparatoria Abraham Lincoln. Todos los derechos reservados.</p>
+            <p>&copy; 2024 Preparatoria Abraham Lincoln. Todos los derechos reservados.</p>
+            <p>📍 Calle Principal #123, Tu Ciudad.</p>
             <div class="social-links">
-                <a href="#">Facebook</a> | <a href="#">Twitter</a> | <a href="#">Instagram</a>
+                <a href="#">Facebook</a> | <a href="#">Instagram</a> | <a href="#">Twitter</a>
             </div>
         </div>
     </footer>
