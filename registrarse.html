@@ -4,25 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro | Abraham Lincoln</title>
+    <link rel="icon" href="imagenes/circuloabraham.png" type="image/png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="auth-page">
+
     <div class="auth-container">
-        <img src="imagenes/circuloabraham.png" alt="Logo" class="auth-logo">
-        <h2>Crear Cuenta de Alumno</h2>
-        <p>Usa exclusivamente tu cuenta de @gmail.com</p>
+        <div class="auth-header-logo">
+            <img src="imagenes/circuloabraham.png" alt="Logo" class="auth-logo-img">
+            <div class="logo-text-split">
+                <span class="text-yellow">Abraham</span> <span class="text-blue">Lincoln</span>
+            </div>
+        </div>
         
+        <h2 style="text-align: left; color: #333; margin-bottom: 5px;">Crea tu cuenta</h2>
+        <p style="text-align: left; color: #777; font-size: 0.9rem; margin-bottom: 25px;">Únete a nuestra comunidad educativa.</p>
+
         <form id="formSignUpPage">
-            <input type="text" id="regName" placeholder="Nombre Completo" required>
-            <input type="email" id="regEmail" placeholder="Correo Gmail" required>
-            <input type="password" id="regPass" placeholder="Contraseña" required>
-            <button type="submit" class="btn-principal">Registrarse</button>
+            <input type="text" id="regName" placeholder="Nombre completo" required>
+            <input type="email" id="regEmail" placeholder="Correo electrónico @gmail.com" required>
+            <input type="password" id="regPass" placeholder="Contraseña segura" required>
+            
+            <button type="submit" class="btn-auth">Registrarse ahora</button>
         </form>
+
+        <p id="authMessage" style="margin-top: 15px; font-size: 0.85rem;"></p>
+
+        <p style="margin-top: 25px; font-size: 0.9rem; color: #555;">
+            ¿Ya tienes cuenta? <a href="iniciar-sesion.html" style="color: var(--azul); font-weight: bold;">Inicia sesión</a>
+        </p>
         
-        <p id="authMessage" style="color: red; margin-top: 10px;"></p>
-        <p>¿Ya tienes cuenta? <a href="iniciar-sesion.html">Inicia sesión aquí</a></p>
-        <hr>
-        <a href="index.html">← Volver al inicio</a>
+        <a href="index.html" style="display: block; margin-top: 20px; font-size: 0.8rem; color: #aaa; text-decoration: none;">← Volver al inicio</a>
     </div>
 
     <script src="script.js"></script>
