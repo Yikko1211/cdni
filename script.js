@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		navActions.innerHTML = '';
 		navActions.insertAdjacentHTML(
 			'beforeend',
-			'<a class="btn btn-outline btn-aula" href="aula.html">Aula</a>'
+			'<a class="btn btn-outline btn-aula" href="/aula">Aula</a>'
 		);
 		if (authed) {
 			navActions.insertAdjacentHTML(
@@ -70,11 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		} else {
 			navActions.insertAdjacentHTML(
 				'beforeend',
-				'<a class="btn btn-outline btn-login" href="login.html">Iniciar Sesión</a>'
+				'<a class="btn btn-outline btn-login" href="/login">Iniciar Sesión</a>'
 			);
 			navActions.insertAdjacentHTML(
 				'beforeend',
-				'<a class="btn btn-solid btn-register" href="login.html#register">Registrarse</a>'
+				'<a class="btn btn-solid btn-register" href="/login#register">Registrarse</a>'
 			);
 		}
 	}
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				document.cookie = `${expire}; secure`;
 			}
 			document.body.classList.remove('is-auth');
-			window.location.href = 'index.html';
+			window.location.href = '/';
 		});
 	});
 
@@ -113,13 +113,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Si estás autenticado, evita volver al login
 	const path = window.location.pathname;
 	if ((path.includes('login.html') || path === '/login' || path.startsWith('/login/')) && isAuthenticated()) {
-		window.location.href = 'aula.html';
+		window.location.href = '/aula';
 		return;
 	}
 
 	// Si estás en aula y no estás autenticado, redirigir al login
 	if ((path.includes('/aula') || path.includes('aula.html')) && !isAuthenticated()) {
-		window.location.href = 'login.html';
+		window.location.href = '/login';
 	}
 });
 
