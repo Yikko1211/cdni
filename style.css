@@ -91,6 +91,7 @@ nav a:hover::after {
 
 /* --- HERO SECTION --- */
 .hero {
+	position: relative;
 	height: 100vh;
 	background: linear-gradient(rgba(10, 31, 68, 0.7), rgba(10, 31, 68, 0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
 	background-size: cover;
@@ -103,6 +104,35 @@ nav a:hover::after {
 	text-align: center;
 	color: var(--white);
 	padding: 0 20px;
+}
+
+.hero-logo {
+	position: absolute;
+	width: 220px;
+	height: 220px;
+	object-fit: contain;
+	opacity: 0.7;
+	filter: blur(0px);
+	animation: logoBlur 2.2s ease forwards;
+	z-index: 0;
+}
+
+.hero h1,
+.hero p,
+.hero .btn {
+	position: relative;
+	z-index: 1;
+}
+
+@keyframes logoBlur {
+	0% {
+		opacity: 1;
+		filter: blur(0px);
+	}
+	100% {
+		opacity: 0.6;
+		filter: blur(6px);
+	}
 }
 
 .hero h1 {
