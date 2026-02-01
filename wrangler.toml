@@ -8,4 +8,4 @@ pages_build_output_dir = "."
 [[d1_databases]]
 binding = "DB"
 database_name = "prepa_db"
-database_id = "REEMPLAZA_CON_TU_DATABASE_ID"
+database_id = "b83d03f2-0f13-4404-8e6a-cd2b697446df"
