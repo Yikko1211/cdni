@@ -71,6 +71,9 @@ loginFormElement.addEventListener('submit', async (event) => {
 
 		setMessage(loginMessage, 'Sesión iniciada correctamente.', 'success');
 		localStorage.setItem('auth', '1');
+		if (data?.user?.name) localStorage.setItem('userName', data.user.name);
+		if (data?.user?.email) localStorage.setItem('userEmail', data.user.email);
+		if (!data?.user?.email && email) localStorage.setItem('userEmail', email);
 		window.location.href = 'aula.html';
 	} catch (error) {
 		setMessage(loginMessage, 'Error de conexión. Intenta más tarde.', 'error');

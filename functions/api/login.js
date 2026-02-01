@@ -46,7 +46,7 @@ export async function onRequestPost({ request, env }) {
 			)`
 		).run();
 
-		const user = await env.DB.prepare('SELECT id, password_hash, password_salt FROM users WHERE email = ?')
+		const user = await env.DB.prepare('SELECT id, name, email, password_hash, password_salt FROM users WHERE email = ?')
 			.bind(email)
 			.first();
 
@@ -59,7 +59,14 @@ export async function onRequestPost({ request, env }) {
 			return jsonResponse(401, { message: 'Credenciales inválidas.' });
 		}
 
-		return jsonResponse(200, { message: 'Inicio de sesión correcto.' });
+		return jsonResponse(200, {
+			message: 'Inicio de sesión correcto.',
+			user: {
+				id: user.id,
+				name: user.name,
+				email: user.email
+			}
+		});
 	} catch (error) {
 		return jsonResponse(500, { message: 'Error interno al iniciar sesión.', detail: String(error) });
 	}

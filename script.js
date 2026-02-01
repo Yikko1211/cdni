@@ -24,32 +24,54 @@ window.addEventListener('scroll', function() {
 const isAuthenticated = () => localStorage.getItem('auth') === '1';
 
 document.addEventListener('DOMContentLoaded', () => {
-	if (isAuthenticated()) {
+	const authed = isAuthenticated();
+	if (authed) {
 		document.body.classList.add('is-auth');
 	} else {
 		document.body.classList.remove('is-auth');
 	}
 
-	// Remover botones según estado de sesión (no solo ocultar con CSS)
-	const loginBtn = document.querySelector('.btn-login');
-	const registerBtn = document.querySelector('.btn-register');
-	const logoutBtn = document.querySelector('.btn-logout');
-	if (isAuthenticated()) {
-		loginBtn?.remove();
-		registerBtn?.remove();
-	} else {
-		logoutBtn?.remove();
+	// Renderizar acciones del header según sesión (evita que se vean botones incorrectos)
+	const navActions = document.querySelector('.nav-actions');
+	if (navActions) {
+		navActions.innerHTML = '';
+		if (authed) {
+			navActions.insertAdjacentHTML(
+				'beforeend',
+				'<a class="btn btn-outline btn-logout" href="#">Cerrar Sesión</a>'
+			);
+		} else {
+			navActions.insertAdjacentHTML(
+				'beforeend',
+				'<a class="btn btn-outline btn-login" href="login.html">Iniciar Sesión</a>'
+			);
+			navActions.insertAdjacentHTML(
+				'beforeend',
+				'<a class="btn btn-solid btn-register" href="login.html#register">Registrarse</a>'
+			);
+		}
 	}
 
-	const logoutButtons = document.querySelectorAll('.btn-logout');
-	logoutButtons.forEach((btn) => {
+	// Logout (después de renderizar botones)
+	document.querySelectorAll('.btn-logout').forEach((btn) => {
 		btn.addEventListener('click', (event) => {
 			event.preventDefault();
 			localStorage.removeItem('auth');
+			localStorage.removeItem('userName');
+			localStorage.removeItem('userEmail');
 			document.body.classList.remove('is-auth');
 			window.location.href = 'index.html';
 		});
 	});
+
+	// Mostrar bienvenida en aula
+	const welcomeEl = document.getElementById('welcomeUser');
+	if (welcomeEl) {
+		const name = (localStorage.getItem('userName') || '').trim();
+		const email = (localStorage.getItem('userEmail') || '').trim();
+		const label = name || email;
+		welcomeEl.textContent = label ? `Sesión iniciada como: ${label}` : '';
+	}
 
 	// Si estás autenticado, evita volver al login
 	const path = window.location.pathname;
