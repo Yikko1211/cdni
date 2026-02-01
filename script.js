@@ -36,6 +36,16 @@ const safeLocalGet = (key) => {
 	}
 };
 
+const getSiteUrls = () => {
+	const host = (window.location.hostname || '').toLowerCase();
+	const isTigres = host === 'tigreslincoln.com' || host === 'www.tigreslincoln.com';
+	return {
+		home: isTigres ? 'https://tigreslincoln.com/' : '/',
+		login: isTigres ? 'https://tigreslincoln.com/login' : '/login',
+		aula: isTigres ? 'https://tigreslincoln.com/aula' : '/aula'
+	};
+};
+
 // Control de sesión simple
 const isAuthenticated = () => {
 	const cookieAuth = (getCookie('auth') || '').trim().toLowerCase();
@@ -47,6 +57,7 @@ const isAuthenticated = () => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+	const urls = getSiteUrls();
 	const authed = isAuthenticated();
 	if (authed) {
 		document.body.classList.add('is-auth');
@@ -60,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		navActions.innerHTML = '';
 		navActions.insertAdjacentHTML(
 			'beforeend',
-			'<a class="btn btn-outline btn-aula" href="/aula">Aula</a>'
+			`<a class="btn btn-outline btn-aula" href="${urls.aula}">Aula</a>`
 		);
 		if (authed) {
 			navActions.insertAdjacentHTML(
@@ -70,11 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		} else {
 			navActions.insertAdjacentHTML(
 				'beforeend',
-				'<a class="btn btn-outline btn-login" href="/login">Iniciar Sesión</a>'
+				`<a class="btn btn-outline btn-login" href="${urls.login}">Iniciar Sesión</a>`
 			);
 			navActions.insertAdjacentHTML(
 				'beforeend',
-				'<a class="btn btn-solid btn-register" href="/login#register">Registrarse</a>'
+				`<a class="btn btn-solid btn-register" href="${urls.login}#register">Registrarse</a>`
 			);
 		}
 	}
@@ -97,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				document.cookie = `${expire}; secure`;
 			}
 			document.body.classList.remove('is-auth');
-			window.location.href = '/';
+			window.location.href = urls.home;
 		});
 	});
 
@@ -113,13 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Si estás autenticado, evita volver al login
 	const path = window.location.pathname;
 	if ((path.includes('login.html') || path === '/login' || path.startsWith('/login/')) && isAuthenticated()) {
-		window.location.href = '/aula';
+		window.location.href = urls.aula;
 		return;
 	}
 
 	// Si estás en aula y no estás autenticado, redirigir al login
 	if ((path.includes('/aula') || path.includes('aula.html')) && !isAuthenticated()) {
-		window.location.href = '/login';
+		window.location.href = urls.login;
 	}
 });
 

@@ -344,7 +344,13 @@ footer {
 /* --- RESPONSIVE --- */
 @media (max-width: 768px) {
 	.hero h1 { font-size: 2.5rem; }
-	nav ul { display: none; } /* En móvil se ocultaría o se usaría menú hamburguesa */
+	nav ul {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 14px;
+		width: 100%;
+	}
 	.quote-text { font-size: 1.4rem; }
 	header { flex-wrap: wrap; gap: 10px; }
 	.logo { width: 100%; justify-content: center; }
