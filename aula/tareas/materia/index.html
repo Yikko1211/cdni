@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tareas | Aula Virtual</title>
+    <title>Materia | Aula Virtual</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/style.css?v=20260201-2">
@@ -14,28 +14,11 @@
         .module p { color: #555; }
         .module-card { background: var(--white); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); padding: 22px; margin-top: 18px; }
         .module-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-
-        .class-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-        .class-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: var(--primary);
-            color: var(--white);
-            font-weight: 600;
-            font-size: 0.85rem;
-            letter-spacing: 0.2px;
-            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-        }
-        .class-btn:hover {
-            background: var(--secondary);
-            color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.25);
-        }
-        .task-note { margin-top: 12px; font-size: 0.9rem; color: #666; }
+        .task-list { margin-top: 14px; display: grid; gap: 10px; }
+        .task-item { background: #f8f8f8; border-radius: 12px; padding: 14px; border: 1px solid rgba(0,0,0,0.06); }
+        .task-item h3 { font-family: 'Poppins', sans-serif; font-size: 1rem; color: var(--primary); margin-bottom: 6px; }
+        .task-item p { font-size: 0.9rem; color: #666; }
+        .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: rgba(10,31,68,0.08); color: var(--primary); font-weight: 600; font-size: 0.85rem; margin-top: 10px; }
     </style>
 </head>
 <body class="aula-page is-auth">
@@ -55,18 +38,23 @@
     </header>
 
     <main class="module">
-        <h1><i class="fas fa-book" style="margin-right:8px;"></i>Tareas</h1>
+        <h1 id="subjectTitle"><i class="fas fa-book" style="margin-right:8px;"></i>Materia</h1>
         <p id="welcomeUser" style="margin-top: 6px;"></p>
+        <div class="pill" id="subjectMeta" aria-live="polite"></div>
 
         <div class="module-card">
-            <p>Selecciona tu materia para ver y entregar tareas.</p>
+            <p>Estas son tus tareas de esta materia. (Placeholder)</p>
 
-            <div id="tasksByClass" class="class-grid" aria-label="Lista de materias"></div>
-            <p id="taskNotice" class="task-note"></p>
+            <div class="task-list" id="taskList">
+                <div class="task-item">
+                    <h3>Tarea 1</h3>
+                    <p>Próximamente: listado real de tareas por materia.</p>
+                </div>
+            </div>
 
             <div class="module-actions">
-                <a class="btn" href="/aula">Volver al Aula</a>
-                <a class="btn btn-outline" href="/">Volver al Inicio</a>
+                <a class="btn" href="/aula/tareas/">Volver a Tareas</a>
+                <a class="btn btn-outline" href="/aula">Volver al Aula</a>
             </div>
         </div>
     </main>

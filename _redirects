@@ -4,6 +4,9 @@
 /aula/tareas /aula/tareas/index.html 200
 /aula/tareas/ /aula/tareas/index.html 200
 
+# Materias (catch-all)
+/aula/tareas/* /aula/tareas/materia/index.html 200
+
 /aula/anuncios /aula/anuncios/index.html 200
 /aula/anuncios/ /aula/anuncios/index.html 200
 
