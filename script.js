@@ -21,7 +21,13 @@ window.addEventListener('scroll', function() {
 });
 
 // Control de sesión simple
-const isAuthenticated = () => localStorage.getItem('auth') === '1';
+const isAuthenticated = () => {
+	const authFlag = (localStorage.getItem('auth') || '').trim().toLowerCase();
+	const hasUser = Boolean(
+		(localStorage.getItem('userEmail') || '').trim() || (localStorage.getItem('userName') || '').trim()
+	);
+	return authFlag === '1' || authFlag === 'true' || hasUser;
+};
 
 document.addEventListener('DOMContentLoaded', () => {
 	const authed = isAuthenticated();
@@ -61,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		btn.addEventListener('click', (event) => {
 			event.preventDefault();
 			localStorage.removeItem('auth');
+			localStorage.removeItem('authBool');
 			localStorage.removeItem('userName');
 			localStorage.removeItem('userEmail');
 			document.body.classList.remove('is-auth');
