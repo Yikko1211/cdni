@@ -346,7 +346,15 @@ footer {
 	.hero h1 { font-size: 2.5rem; }
 	nav ul { display: none; } /* En móvil se ocultaría o se usaría menú hamburguesa */
 	.quote-text { font-size: 1.4rem; }
-	.nav-actions { display: none; }
+	header { flex-wrap: wrap; gap: 10px; }
+	.logo { width: 100%; justify-content: center; }
+	.nav-actions {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
 }
 
 /* --- LOGIN PAGE --- */
