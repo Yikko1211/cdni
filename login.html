@@ -13,6 +13,8 @@
             --secondary: #c5a059;
             --white: #ffffff;
             --bg-overlay: rgba(10, 31, 68, 0.85);
+            --ease-transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            --ease-static-transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,7 +41,7 @@
         }
 
         .container {
-            background: var(--white);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
             position: relative;
@@ -50,8 +52,7 @@
             display: flex;
             animation: fadeIn 1s ease;
             border: 1px solid rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
         }
 
         /* --- SECCIÓN DE FORMULARIO (IZQUIERDA) --- */
@@ -119,7 +120,7 @@
             border-radius: 8px;
             font-family: 'Poppins', sans-serif;
             outline: none;
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            transition: var(--ease-transition);
         }
 
         input:focus {
@@ -220,7 +221,7 @@
 
             .social-container a,
             input {
-                transition: all 0.3s ease;
+                transition: var(--ease-static-transition);
             }
 
             input:focus {
