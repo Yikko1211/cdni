@@ -31,7 +31,7 @@
             font-family: 'Poppins', sans-serif;
             color: var(--text-dark);
             overflow-x: hidden;
-            background-color: #f9f9f9;
+            background: linear-gradient(180deg, #f9f9f9 0%, #ffffff 45%, #f1f1f1 100%);
         }
 
         h1, h2, h3 {
@@ -57,6 +57,7 @@
             align-items: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            backdrop-filter: blur(6px);
         }
 
         .logo {
@@ -70,6 +71,7 @@
 
         .logo i {
             color: var(--secondary);
+            animation: float 4s ease-in-out infinite;
         }
 
         nav ul {
@@ -114,6 +116,23 @@
             text-align: center;
             color: var(--white);
             padding: 0 20px;
+            position: relative;
+            overflow: hidden;
+            animation: heroZoom 18s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: -20%;
+            background: radial-gradient(circle at top, rgba(197, 160, 89, 0.25), transparent 60%);
+            opacity: 0.7;
+            animation: glowPulse 10s ease-in-out infinite;
+        }
+
+        .hero > * {
+            position: relative;
+            z-index: 1;
         }
 
         .hero h1 {
@@ -184,6 +203,17 @@
             margin-bottom: 60px;
             font-size: 2.5rem;
             color: var(--primary);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 90px;
+            height: 3px;
+            background-color: var(--secondary);
+            border-radius: 3px;
+            margin: 16px auto 0;
         }
 
         .cards-container {
@@ -210,6 +240,11 @@
             height: 200px;
             background-size: cover;
             background-position: center;
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover .card-img {
+            transform: scale(1.05);
         }
 
         .card-content {
@@ -280,6 +315,21 @@
             padding-top: 20px;
             font-size: 0.8rem;
             opacity: 0.6;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes heroZoom {
+            0%, 100% { background-size: 100%; }
+            50% { background-size: 108%; }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { transform: translateY(0); opacity: 0.6; }
+            50% { transform: translateY(-10px); opacity: 0.9; }
         }
 
         /* --- RESPONSIVE --- */
