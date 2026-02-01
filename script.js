@@ -47,7 +47,7 @@ const isAuthenticated = () => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-	const urls = { home: '/', login: '/login/', aula: '/aula/' };
+	const urls = { home: '/', login: '/login/', aula: '/aula' };
 	const authed = isAuthenticated();
 	if (authed) {
 		document.body.classList.add('is-auth');

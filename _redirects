@@ -1,0 +1,8 @@
+/aula /aula/index.html 200
+/aula/ /aula/index.html 200
+
+/login /login/index.html 200
+/login/ /login/index.html 200
+
+/aula.html /aula 301
+/login.html /login/ 301
