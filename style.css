@@ -464,6 +464,17 @@ footer {
 	outline: none;
 }
 
+.login-form select {
+	width: 100%;
+	padding: 12px 15px 12px 45px;
+	background-color: #f4f4f4;
+	border: none;
+	border-radius: 8px;
+	font-family: 'Poppins', sans-serif;
+	outline: none;
+	appearance: none;
+}
+
 .login-form button {
 	background-color: var(--primary);
 	color: var(--white);

@@ -30,9 +30,19 @@ export async function onRequestPost({ request, env }) {
 	const name = (body.name || '').trim();
 	const email = (body.email || '').trim().toLowerCase();
 	const password = (body.password || '').trim();
+	const grade = Number.parseInt(String(body.grade ?? '').trim(), 10);
+	const group = String(body.group ?? '').trim().toUpperCase();
 
 	if (!name || !email || !password) {
 		return jsonResponse(400, { message: 'Nombre, correo y contraseña son obligatorios.' });
+	}
+
+	if (!Number.isFinite(grade) || grade < 1 || grade > 6) {
+		return jsonResponse(400, { message: 'Grado inválido. Debe ser del 1 al 6.' });
+	}
+
+	if (!['A', 'B', 'C', 'D'].includes(group)) {
+		return jsonResponse(400, { message: 'Grupo inválido. Debe ser A, B, C o D.' });
 	}
 
 	if (password.length < 6) {
@@ -47,9 +57,15 @@ export async function onRequestPost({ request, env }) {
 				email TEXT NOT NULL UNIQUE,
 				password_hash TEXT NOT NULL,
 				password_salt TEXT NOT NULL,
+				grade INTEGER,
+				group_code TEXT,
 				created_at TEXT NOT NULL
 			)`
 		).run();
+
+		// Migración suave para instalaciones existentes
+		try { await env.DB.prepare('ALTER TABLE users ADD COLUMN grade INTEGER').run(); } catch {}
+		try { await env.DB.prepare('ALTER TABLE users ADD COLUMN group_code TEXT').run(); } catch {}
 
 		const existing = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
 		if (existing) {
@@ -61,9 +77,9 @@ export async function onRequestPost({ request, env }) {
 		const passwordHash = await hashPassword(password, salt);
 
 		await env.DB.prepare(
-			'INSERT INTO users (name, email, password_hash, password_salt, created_at) VALUES (?, ?, ?, ?, datetime("now"))'
+			'INSERT INTO users (name, email, password_hash, password_salt, grade, group_code, created_at) VALUES (?, ?, ?, ?, ?, ?, datetime("now"))'
 		)
-			.bind(name, email, passwordHash, salt)
+			.bind(name, email, passwordHash, salt, grade, group)
 			.run();
 
 		return jsonResponse(201, { message: 'Registro exitoso.' });

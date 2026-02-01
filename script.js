@@ -90,6 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				localStorage.removeItem('authBool');
 				localStorage.removeItem('userName');
 				localStorage.removeItem('userEmail');
+				localStorage.removeItem('userGrade');
+				localStorage.removeItem('userGroup');
 			} catch {
 				// ignore
 			}
@@ -108,8 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (welcomeEl) {
 		const name = (localStorage.getItem('userName') || '').trim();
 		const email = (localStorage.getItem('userEmail') || '').trim();
+		const grade = (localStorage.getItem('userGrade') || '').trim();
+		const group = (localStorage.getItem('userGroup') || '').trim();
 		const label = name || email;
-		welcomeEl.textContent = label ? `Sesión iniciada como: ${label}` : '';
+		const extra = (grade && group) ? ` · ${grade}° ${group}` : '';
+		welcomeEl.textContent = label ? `Sesión iniciada como: ${label}${extra}` : '';
 	}
 
 	// Si estás autenticado, evita volver al login

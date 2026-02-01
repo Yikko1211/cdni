@@ -42,11 +42,17 @@ export async function onRequestPost({ request, env }) {
 				email TEXT NOT NULL UNIQUE,
 				password_hash TEXT NOT NULL,
 				password_salt TEXT NOT NULL,
+				grade INTEGER,
+				group_code TEXT,
 				created_at TEXT NOT NULL
 			)`
 		).run();
 
-		const user = await env.DB.prepare('SELECT id, name, email, password_hash, password_salt FROM users WHERE email = ?')
+		// Migración suave para instalaciones existentes
+		try { await env.DB.prepare('ALTER TABLE users ADD COLUMN grade INTEGER').run(); } catch {}
+		try { await env.DB.prepare('ALTER TABLE users ADD COLUMN group_code TEXT').run(); } catch {}
+
+		const user = await env.DB.prepare('SELECT id, name, email, password_hash, password_salt, grade, group_code FROM users WHERE email = ?')
 			.bind(email)
 			.first();
 
@@ -64,7 +70,9 @@ export async function onRequestPost({ request, env }) {
 			user: {
 				id: user.id,
 				name: user.name,
-				email: user.email
+				email: user.email,
+				grade: user.grade ?? null,
+				group: user.group_code ?? null
 			}
 		});
 	} catch (error) {
