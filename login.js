@@ -65,6 +65,7 @@ loginFormElement.addEventListener('submit', async (event) => {
 		}
 
 		setMessage(loginMessage, 'Sesión iniciada correctamente.', 'success');
+		window.location.href = 'aula.html'; // Redirect to aula.html after successful login
 	} catch (error) {
 		setMessage(loginMessage, 'Error de conexión. Intenta más tarde.', 'error');
 	}
