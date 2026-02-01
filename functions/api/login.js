@@ -34,29 +34,33 @@ export async function onRequestPost({ request, env }) {
 		return jsonResponse(400, { message: 'Correo y contraseña son obligatorios.' });
 	}
 
-	await env.DB.exec(`
-		CREATE TABLE IF NOT EXISTS users (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			name TEXT NOT NULL,
-			email TEXT NOT NULL UNIQUE,
-			password_hash TEXT NOT NULL,
-			password_salt TEXT NOT NULL,
-			created_at TEXT NOT NULL
-		);
-	`);
+	try {
+		await env.DB.prepare(
+			`CREATE TABLE IF NOT EXISTS users (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				name TEXT NOT NULL,
+				email TEXT NOT NULL UNIQUE,
+				password_hash TEXT NOT NULL,
+				password_salt TEXT NOT NULL,
+				created_at TEXT NOT NULL
+			)`
+		).run();
 
-	const user = await env.DB.prepare('SELECT id, password_hash, password_salt FROM users WHERE email = ?')
-		.bind(email)
-		.first();
+		const user = await env.DB.prepare('SELECT id, password_hash, password_salt FROM users WHERE email = ?')
+			.bind(email)
+			.first();
 
-	if (!user) {
-		return jsonResponse(401, { message: 'Credenciales inválidas.' });
+		if (!user) {
+			return jsonResponse(401, { message: 'Credenciales inválidas.' });
+		}
+
+		const passwordHash = await hashPassword(password, user.password_salt);
+		if (passwordHash !== user.password_hash) {
+			return jsonResponse(401, { message: 'Credenciales inválidas.' });
+		}
+
+		return jsonResponse(200, { message: 'Inicio de sesión correcto.' });
+	} catch (error) {
+		return jsonResponse(500, { message: 'Error interno al iniciar sesión.', detail: String(error) });
 	}
-
-	const passwordHash = await hashPassword(password, user.password_salt);
-	if (passwordHash !== user.password_hash) {
-		return jsonResponse(401, { message: 'Credenciales inválidas.' });
-	}
-
-	return jsonResponse(200, { message: 'Inicio de sesión correcto.' });
 }

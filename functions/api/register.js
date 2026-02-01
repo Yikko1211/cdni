@@ -39,31 +39,35 @@ export async function onRequestPost({ request, env }) {
 		return jsonResponse(400, { message: 'La contraseña debe tener al menos 6 caracteres.' });
 	}
 
-	await env.DB.exec(`
-		CREATE TABLE IF NOT EXISTS users (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			name TEXT NOT NULL,
-			email TEXT NOT NULL UNIQUE,
-			password_hash TEXT NOT NULL,
-			password_salt TEXT NOT NULL,
-			created_at TEXT NOT NULL
-		);
-	`);
+	try {
+		await env.DB.prepare(
+			`CREATE TABLE IF NOT EXISTS users (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				name TEXT NOT NULL,
+				email TEXT NOT NULL UNIQUE,
+				password_hash TEXT NOT NULL,
+				password_salt TEXT NOT NULL,
+				created_at TEXT NOT NULL
+			)`
+		).run();
 
-	const existing = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
-	if (existing) {
-		return jsonResponse(409, { message: 'Este correo ya está registrado.' });
+		const existing = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
+		if (existing) {
+			return jsonResponse(409, { message: 'Este correo ya está registrado.' });
+		}
+
+		const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+		const salt = toHex(saltBytes);
+		const passwordHash = await hashPassword(password, salt);
+
+		await env.DB.prepare(
+			'INSERT INTO users (name, email, password_hash, password_salt, created_at) VALUES (?, ?, ?, ?, datetime("now"))'
+		)
+			.bind(name, email, passwordHash, salt)
+			.run();
+
+		return jsonResponse(201, { message: 'Registro exitoso.' });
+	} catch (error) {
+		return jsonResponse(500, { message: 'Error interno en el registro.', detail: String(error) });
 	}
-
-	const saltBytes = crypto.getRandomValues(new Uint8Array(16));
-	const salt = toHex(saltBytes);
-	const passwordHash = await hashPassword(password, salt);
-
-	await env.DB.prepare(
-		'INSERT INTO users (name, email, password_hash, password_salt, created_at) VALUES (?, ?, ?, ?, datetime("now"))'
-	)
-		.bind(name, email, passwordHash, salt)
-		.run();
-
-	return jsonResponse(201, { message: 'Registro exitoso.' });
 }
