@@ -36,16 +36,6 @@ const safeLocalGet = (key) => {
 	}
 };
 
-const getSiteUrls = () => {
-	const host = (window.location.hostname || '').toLowerCase();
-	const isTigres = host === 'tigreslincoln.com' || host === 'www.tigreslincoln.com';
-	return {
-		home: isTigres ? 'https://tigreslincoln.com/' : '/',
-		login: isTigres ? 'https://tigreslincoln.com/login' : '/login',
-		aula: isTigres ? 'https://tigreslincoln.com/aula' : '/aula'
-	};
-};
-
 // Control de sesión simple
 const isAuthenticated = () => {
 	const cookieAuth = (getCookie('auth') || '').trim().toLowerCase();
@@ -57,7 +47,7 @@ const isAuthenticated = () => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-	const urls = getSiteUrls();
+	const urls = { home: '/', login: '/login', aula: '/aula' };
 	const authed = isAuthenticated();
 	if (authed) {
 		document.body.classList.add('is-auth');
