@@ -30,7 +30,8 @@ export async function onRequestPost({ request, env }) {
 	const name = (body.name || '').trim();
 	const email = (body.email || '').trim().toLowerCase();
 	const password = (body.password || '').trim();
-	const grade = Number.parseInt(String(body.grade ?? '').trim(), 10);
+	const gradeRaw = String(body.grade ?? '').trim();
+	const grade = Number.parseInt(gradeRaw.replace(/[^0-9]/g, ''), 10);
 	const group = String(body.group ?? '').trim().toUpperCase();
 
 	if (!name || !email || !password) {
@@ -38,7 +39,7 @@ export async function onRequestPost({ request, env }) {
 	}
 
 	if (!Number.isFinite(grade) || grade < 1 || grade > 6) {
-		return jsonResponse(400, { message: 'Grado inválido. Debe ser del 1 al 6.' });
+		return jsonResponse(400, { message: `Grado inválido. Debe ser del 1 al 6. (recibido: ${gradeRaw || 'vacío'})` });
 	}
 
 	if (!['A', 'B', 'C', 'D'].includes(group)) {
