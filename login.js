@@ -65,9 +65,13 @@ loginFormElement.addEventListener('submit', async (event) => {
 		}
 
 		setMessage(loginMessage, 'Sesión iniciada correctamente.', 'success');
+		const target = '/aula';
+		window.location.assign(target);
 		setTimeout(() => {
-			window.location.replace('/aula');
-		}, 300);
+			if (window.location.pathname === '/login' || window.location.pathname === '/login.html') {
+				window.location.assign('/aula.html');
+			}
+		}, 800);
 	} catch (error) {
 		setMessage(loginMessage, 'Error de conexión. Intenta más tarde.', 'error');
 	}
