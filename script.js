@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	const navActions = document.querySelector('.nav-actions');
 	if (navActions) {
 		navActions.innerHTML = '';
+		navActions.insertAdjacentHTML(
+			'beforeend',
+			'<a class="btn btn-outline btn-aula" href="aula.html">Aula</a>'
+		);
 		if (authed) {
 			navActions.insertAdjacentHTML(
 				'beforeend',
