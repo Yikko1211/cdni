@@ -52,6 +52,17 @@ header {
 	gap: 12px;
 }
 
+.btn-logout { display: none; }
+
+body.is-auth .nav-actions .btn-login,
+body.is-auth .nav-actions .btn-register {
+	display: none;
+}
+
+body.is-auth .nav-actions .btn-logout {
+	display: inline-flex;
+}
+
 .btn.btn-outline {
 	background: transparent;
 	color: var(--white);

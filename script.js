@@ -1,10 +1,12 @@
 
 // Inicializar animaciones
-AOS.init({
-	duration: 1000, // Duración de la animación en milisegundos
-	once: true,     // La animación solo ocurre una vez al bajar
-	offset: 100     // Offset (en px) desde el borde inferior original para activar la animación
-});
+if (window.AOS) {
+	AOS.init({
+		duration: 1000, // Duración de la animación en milisegundos
+		once: true,     // La animación solo ocurre una vez al bajar
+		offset: 100     // Offset (en px) desde el borde inferior original para activar la animación
+	});
+}
 
 // Efecto Navbar transparente a sólido
 window.addEventListener('scroll', function() {
@@ -16,5 +18,23 @@ window.addEventListener('scroll', function() {
 		header.style.padding = '1rem 5%';
 		header.style.backgroundColor = '#0a1f44';
 	}
+});
+
+// Control de sesión simple
+const isAuthenticated = () => localStorage.getItem('auth') === '1';
+
+document.addEventListener('DOMContentLoaded', () => {
+	if (isAuthenticated()) {
+		document.body.classList.add('is-auth');
+	}
+
+	const logoutButtons = document.querySelectorAll('.btn-logout');
+	logoutButtons.forEach((btn) => {
+		btn.addEventListener('click', (event) => {
+			event.preventDefault();
+			localStorage.removeItem('auth');
+			window.location.assign('/');
+		});
+	});
 });
 
