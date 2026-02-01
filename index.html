@@ -118,16 +118,15 @@
             padding: 0 20px;
             position: relative;
             overflow: hidden;
-            animation: heroZoom 18s ease-in-out infinite;
         }
 
         .hero::after {
             content: '';
             position: absolute;
-            inset: -20%;
-            background: radial-gradient(circle at top, rgba(197, 160, 89, 0.25), transparent 60%);
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(197, 160, 89, 0.25) 0%, transparent 70%);
             opacity: 0.7;
-            animation: glowPulse 10s ease-in-out infinite;
+            animation: glowFloat 10s ease-in-out infinite;
         }
 
         .hero > * {
@@ -322,14 +321,34 @@
             50% { transform: translateY(-6px); }
         }
 
-        @keyframes heroZoom {
-            0%, 100% { background-size: 100%; }
-            50% { background-size: 108%; }
+        @keyframes glowFloat {
+            0%, 100% { transform: translateY(0); opacity: 0.7; }
+            50% { transform: translateY(-10px); opacity: 0.9; }
         }
 
-        @keyframes glowPulse {
-            0%, 100% { transform: translateY(0); opacity: 0.6; }
-            50% { transform: translateY(-10px); opacity: 0.9; }
+        @media (prefers-reduced-motion: reduce) {
+            .logo i,
+            .hero::after {
+                animation: none;
+            }
+
+            .card {
+                transition: box-shadow 0.3s;
+            }
+
+            .card-img {
+                transition: none;
+            }
+
+            .btn {
+                transition: box-shadow 0.3s, background-color 0.3s, color 0.3s;
+            }
+
+            .card:hover,
+            .card:hover .card-img,
+            .btn:hover {
+                transform: none;
+            }
         }
 
         /* --- RESPONSIVE --- */
