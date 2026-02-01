@@ -37,6 +37,25 @@ const safeLocalGet = (key) => {
 	}
 };
 
+const normalizeGrade = (value) => {
+	const n = Number.parseInt(String(value ?? '').trim(), 10);
+	if (!Number.isFinite(n)) return null;
+	if (n < 1 || n > 6) return null;
+	return n;
+};
+
+const normalizeGroup = (value) => {
+	const s = String(value ?? '').trim().toUpperCase();
+	if (!['A', 'B', 'C', 'D'].includes(s)) return null;
+	return s;
+};
+
+const getStoredProfile = () => {
+	const grade = normalizeGrade(safeLocalGet('userGrade'));
+	const group = normalizeGroup(safeLocalGet('userGroup'));
+	return { grade, group };
+};
+
 // Control de sesión simple
 const isAuthenticated = () => {
 	const cookieAuth = (getCookie('auth') || '').trim().toLowerCase();
@@ -110,11 +129,84 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (welcomeEl) {
 		const name = (localStorage.getItem('userName') || '').trim();
 		const email = (localStorage.getItem('userEmail') || '').trim();
-		const grade = (localStorage.getItem('userGrade') || '').trim();
-		const group = (localStorage.getItem('userGroup') || '').trim();
+		const { grade, group } = getStoredProfile();
 		const label = name || email;
 		const extra = (grade && group) ? ` · ${grade}° ${group}` : '';
 		welcomeEl.textContent = label ? `Sesión iniciada como: ${label}${extra}` : '';
+	}
+
+	// Completar perfil si faltan datos (solo dentro de /aula/*)
+	const path = window.location.pathname;
+	if (authed && path.startsWith('/aula') && !path.startsWith('/aula/perfil')) {
+		const email = (safeLocalGet('userEmail') || '').trim();
+		if (!email) {
+			window.location.href = '/login/';
+			return;
+		}
+		const { grade, group } = getStoredProfile();
+		if (!grade || !group) {
+			window.location.href = '/aula/perfil/';
+			return;
+		}
+	}
+
+	// Formulario de perfil (/aula/perfil/)
+	const profileForm = document.getElementById('profileForm');
+	if (profileForm) {
+		const msgEl = document.getElementById('profileMessage');
+		const gradeEl = document.getElementById('profileGrade');
+		const groupEl = document.getElementById('profileGroup');
+		// Prefill desde localStorage si existe
+		const stored = getStoredProfile();
+		if (gradeEl && stored.grade) gradeEl.value = String(stored.grade);
+		if (groupEl && stored.group) groupEl.value = stored.group;
+
+		const setMsg = (text, type) => {
+			if (!msgEl) return;
+			msgEl.textContent = text;
+			msgEl.classList.remove('success', 'error');
+			if (type) msgEl.classList.add(type);
+		};
+
+		profileForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			setMsg('', null);
+			const email = (safeLocalGet('userEmail') || '').trim().toLowerCase();
+			const grade = normalizeGrade(gradeEl?.value);
+			const group = normalizeGroup(groupEl?.value);
+			if (!email) {
+				setMsg('No se encontró tu correo. Vuelve a iniciar sesión.', 'error');
+				return;
+			}
+			if (!grade || !group) {
+				setMsg('Selecciona tu grado (1 a 6) y grupo (A a D).', 'error');
+				return;
+			}
+			try {
+				const res = await fetch('/api/profile', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ email, grade, group })
+				});
+				const text = await res.text();
+				let data;
+				try { data = JSON.parse(text); } catch { data = { message: null, raw: text }; }
+				if (!res.ok) {
+					setMsg(data?.message || `No se pudo guardar (HTTP ${res.status}).`, 'error');
+					return;
+				}
+				try {
+					localStorage.setItem('userGrade', String(grade));
+					localStorage.setItem('userGroup', group);
+				} catch {
+					// ignore
+				}
+				setMsg('Perfil guardado. Redirigiendo…', 'success');
+				setTimeout(() => { window.location.href = '/aula'; }, 250);
+			} catch {
+				setMsg('Error de conexión. Intenta más tarde.', 'error');
+			}
+		});
 	}
 
 	// Render de materias en /aula/tareas (según grado)
@@ -297,7 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// Si estás autenticado, evita volver al login
-	const path = window.location.pathname;
 	if ((path.includes('login.html') || path === '/login' || path.startsWith('/login/')) && isAuthenticated()) {
 		window.location.href = urls.aula;
 		return;

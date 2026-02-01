@@ -17,6 +17,8 @@
 /aula/pagos/ /aula/pagos/index.html 200
 
 /aula/calificaciones /aula/calificaciones/index.html 200
+/aula/perfil /aula/perfil/index.html 200
+/aula/perfil/ /aula/perfil/index.html 200
 /aula/calificaciones/ /aula/calificaciones/index.html 200
 
 /login /login/index.html 200

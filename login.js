@@ -136,21 +136,12 @@ loginFormElement.addEventListener('submit', async (event) => {
 
 	const email = document.getElementById('loginEmail').value.trim();
 	const password = document.getElementById('loginPassword').value.trim();
-	const gradeRaw = document.getElementById('loginGrade')?.value;
-	const groupRaw = document.getElementById('loginGroup')?.value;
-	const grade = normalizeGrade(gradeRaw);
-	const group = normalizeGroup(groupRaw);
-
-	if (!grade || !group) {
-		setMessage(loginMessage, 'Selecciona tu grado (1 a 6) y grupo (A a D).', 'error');
-		return;
-	}
 
 	try {
 		const response = await fetch('/api/login', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email, password, grade, group })
+			body: JSON.stringify({ email, password })
 		});
 		const data = await readJsonSafe(response);
 
@@ -167,11 +158,11 @@ loginFormElement.addEventListener('submit', async (event) => {
 		safeLocalSet('authBool', 'true');
 		if (data?.user?.name) safeLocalSet('userName', data.user.name);
 		if (data?.user?.email) safeLocalSet('userEmail', data.user.email);
-		// Preferir valores del servidor si vienen, si no usar lo capturado en login
-		const finalGrade = normalizeGrade(data?.user?.grade) ?? grade;
-		const finalGroup = normalizeGroup(data?.user?.group) ?? group;
-		safeLocalSet('userGrade', String(finalGrade));
-		safeLocalSet('userGroup', finalGroup);
+		// Grado/Grupo se guardan desde el usuario registrado (DB)
+		const finalGrade = normalizeGrade(data?.user?.grade);
+		const finalGroup = normalizeGroup(data?.user?.group);
+		if (finalGrade) safeLocalSet('userGrade', String(finalGrade));
+		if (finalGroup) safeLocalSet('userGroup', finalGroup);
 		if (!data?.user?.email && email) safeLocalSet('userEmail', email);
 		setMessageLink(loginMessage, 'Sesión iniciada. Si no te redirige, entra a', '/aula', 'Aula', 'success');
 		const target = new URL('/aula', window.location.origin).toString();
