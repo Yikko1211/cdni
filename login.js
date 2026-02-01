@@ -40,7 +40,8 @@ if (window.location.hash === '#register') {
 
 const getCookie = (name) => {
 	const part = document.cookie
-		.split('; ')
+		.split(';')
+		.map((x) => x.trim())
 		.find((x) => x.startsWith(`${encodeURIComponent(name)}=`));
 	if (!part) return '';
 	return decodeURIComponent(part.split('=').slice(1).join('='));
@@ -63,7 +64,7 @@ const safeLocalSet = (key, value) => {
 };
 
 const setAuthCookie = () => {
-	const base = `auth=1; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
+	const base = `auth=1; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax`;
 	document.cookie = base;
 	if (window.location.protocol === 'https:') {
 		document.cookie = `${base}; secure`;
@@ -79,6 +80,20 @@ const setMessage = (el, text, type) => {
 	el.textContent = text;
 	el.classList.remove('success', 'error');
 	if (type) el.classList.add(type);
+};
+
+const setMessageLink = (el, prefixText, href, linkText, type) => {
+	// Evita innerHTML; construye nodos para link clickeable
+	while (el.firstChild) el.removeChild(el.firstChild);
+	el.classList.remove('success', 'error');
+	if (type) el.classList.add(type);
+	if (prefixText) el.appendChild(document.createTextNode(prefixText));
+	const a = document.createElement('a');
+	a.href = href;
+	a.textContent = linkText;
+	a.style.textDecoration = 'underline';
+	a.style.marginLeft = '4px';
+	el.appendChild(a);
 };
 
 const readJsonSafe = async (response) => {
@@ -131,7 +146,15 @@ loginFormElement.addEventListener('submit', async (event) => {
 		if (data?.user?.name) safeLocalSet('userName', data.user.name);
 		if (data?.user?.email) safeLocalSet('userEmail', data.user.email);
 		if (!data?.user?.email && email) safeLocalSet('userEmail', email);
-		window.location.href = '/aula';
+		setMessageLink(loginMessage, 'Sesión iniciada. Si no te redirige, entra a', '/aula', 'Aula', 'success');
+		// Redirección confiable (replace evita volver atrás al login)
+		window.location.replace('/aula');
+		// Fallback por si algún navegador bloquea la navegación inmediata
+		setTimeout(() => {
+			if (window.location.pathname.includes('/login')) {
+				window.location.replace('/aula');
+			}
+		}, 200);
 	} catch (error) {
 		setMessage(
 			loginMessage,

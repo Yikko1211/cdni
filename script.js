@@ -22,7 +22,8 @@ window.addEventListener('scroll', function() {
 
 const getCookie = (name) => {
 	const part = document.cookie
-		.split('; ')
+		.split(';')
+		.map((x) => x.trim())
 		.find((x) => x.startsWith(`${encodeURIComponent(name)}=`));
 	if (!part) return '';
 	return decodeURIComponent(part.split('=').slice(1).join('='));
@@ -92,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			} catch {
 				// ignore
 			}
-			const expire = 'auth=; path=/; max-age=0; samesite=lax';
+			const expire = 'auth=; Path=/; Max-Age=0; SameSite=Lax';
 			document.cookie = expire;
 			if (window.location.protocol === 'https:') {
 				document.cookie = `${expire}; secure`;
