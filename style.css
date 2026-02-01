@@ -52,6 +52,10 @@ header {
 	gap: 12px;
 }
 
+/* El botón de Aula solo se muestra con sesión iniciada */
+.btn-aula { display: none; }
+body.is-auth .nav-actions .btn-aula { display: inline-flex; }
+
 .btn-logout { display: none; }
 
 body.is-auth .nav-actions .btn-login,
@@ -70,6 +74,12 @@ body.is-auth .nav-actions .btn-logout {
 	padding: 8px 18px;
 	border-radius: 50px;
 	font-size: 0.85rem;
+}
+
+/* En páginas con fondo claro (p.ej. submódulos del aula), el outline blanco se ve invisible */
+.module-actions .btn.btn-outline {
+	color: var(--primary);
+	border-color: var(--primary);
 }
 
 .btn.btn-solid {
