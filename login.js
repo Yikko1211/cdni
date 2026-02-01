@@ -66,7 +66,7 @@ loginFormElement.addEventListener('submit', async (event) => {
 
 		setMessage(loginMessage, 'Sesión iniciada correctamente.', 'success');
 		setTimeout(() => {
-			window.location.replace('/aula.html');
+			window.location.replace('/aula');
 		}, 300);
 	} catch (error) {
 		setMessage(loginMessage, 'Error de conexión. Intenta más tarde.', 'error');
