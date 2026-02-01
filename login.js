@@ -72,7 +72,7 @@ const setAuthCookie = () => {
 
 // Si ya hay sesión iniciada, no mostrar login
 if (safeLocalGet('auth') === '1' || getCookie('auth') === '1') {
-	window.location.href = '/aula';
+	window.location.href = '/aula/';
 }
 
 const setMessage = (el, text, type) => {
@@ -131,7 +131,7 @@ loginFormElement.addEventListener('submit', async (event) => {
 		if (data?.user?.name) safeLocalSet('userName', data.user.name);
 		if (data?.user?.email) safeLocalSet('userEmail', data.user.email);
 		if (!data?.user?.email && email) safeLocalSet('userEmail', email);
-		window.location.href = '/aula';
+		window.location.href = '/aula/';
 	} catch (error) {
 		setMessage(
 			loginMessage,

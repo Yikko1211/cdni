@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Estudiantes | Instituto Abraham Lincoln</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="login-page">
+
+    <header>
+        <div class="logo">
+            <img src="/imagenes/circuloabraham.png" alt="Logo Instituto Abraham Lincoln">
+            INSTITUTO ABRAHAM LINCOLN
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/#nosotros">Nosotros</a></li>
+                <li><a href="/#oferta">Oferta Académica</a></li>
+                <li><a href="/#contacto">Admisiones</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <a href="/" class="home-link"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+
+    <div class="login-wrapper">
+        <div class="login-container">
+        
+        <div class="login-form" id="loginForm">
+            <h2>Bienvenido</h2>
+            <div class="social-container">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-google"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <span>o usa tu correo institucional</span>
+            
+            <form id="loginFormElement" style="margin-top: 20px;">
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input id="loginEmail" type="email" placeholder="Correo Electrónico" required />
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input id="loginPassword" type="password" placeholder="Contraseña" required />
+                </div>
+                <a href="#" style="font-size: 0.8rem; color: #666; display: block; margin-top: 10px; text-align: right;">¿Olvidaste tu contraseña?</a>
+                <button type="submit">Iniciar Sesión</button>
+                <div class="form-message" id="loginMessage"></div>
+            </form>
+        </div>
+
+        <div class="login-form hidden" id="registerForm">
+            <h2>Crear Cuenta</h2>
+            <div class="social-container">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-google"></i></a>
+            </div>
+            <span>o regístrate con tus datos</span>
+            
+            <form id="registerFormElement" style="margin-top: 20px;">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input id="registerName" type="text" placeholder="Nombre Completo" required />
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input id="registerEmail" type="email" placeholder="Correo Electrónico" required />
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input id="registerPassword" type="password" placeholder="Contraseña" required />
+                </div>
+                <button type="submit">Registrarse</button>
+                <div class="form-message" id="registerMessage"></div>
+            </form>
+        </div>
+
+        <div class="overlay-container">
+            <div id="overlayLogin">
+                <h1>¡Hola, Alumno!</h1>
+                <p>Ingresa tus datos personales para acceder al portal académico del Instituto Lincoln.</p>
+                <button class="ghost-btn" id="signUpBtn">Crear Cuenta</button>
+            </div>
+
+            <div id="overlayRegister" class="hidden">
+                <h1>Bienvenido</h1>
+                <p>Para mantenerte conectado con nosotros, por favor inicia sesión con tu cuenta personal.</p>
+                <button class="ghost-btn" id="signInBtn">Iniciar Sesión</button>
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+    <script src="/login.js"></script>
+</body>
+</html>
