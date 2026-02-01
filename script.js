@@ -20,13 +20,30 @@ window.addEventListener('scroll', function() {
 	}
 });
 
+const getCookie = (name) => {
+	const part = document.cookie
+		.split('; ')
+		.find((x) => x.startsWith(`${encodeURIComponent(name)}=`));
+	if (!part) return '';
+	return decodeURIComponent(part.split('=').slice(1).join('='));
+};
+
+const safeLocalGet = (key) => {
+	try {
+		return localStorage.getItem(key);
+	} catch {
+		return null;
+	}
+};
+
 // Control de sesión simple
 const isAuthenticated = () => {
-	const authFlag = (localStorage.getItem('auth') || '').trim().toLowerCase();
+	const cookieAuth = (getCookie('auth') || '').trim().toLowerCase();
+	const authFlag = (safeLocalGet('auth') || '').trim().toLowerCase();
 	const hasUser = Boolean(
-		(localStorage.getItem('userEmail') || '').trim() || (localStorage.getItem('userName') || '').trim()
+		(safeLocalGet('userEmail') || '').trim() || (safeLocalGet('userName') || '').trim()
 	);
-	return authFlag === '1' || authFlag === 'true' || hasUser;
+	return authFlag === '1' || authFlag === 'true' || cookieAuth === '1' || hasUser;
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -66,10 +83,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	document.querySelectorAll('.btn-logout').forEach((btn) => {
 		btn.addEventListener('click', (event) => {
 			event.preventDefault();
-			localStorage.removeItem('auth');
-			localStorage.removeItem('authBool');
-			localStorage.removeItem('userName');
-			localStorage.removeItem('userEmail');
+			try {
+				localStorage.removeItem('auth');
+				localStorage.removeItem('authBool');
+				localStorage.removeItem('userName');
+				localStorage.removeItem('userEmail');
+			} catch {
+				// ignore
+			}
+			const expire = 'auth=; path=/; max-age=0; samesite=lax';
+			document.cookie = expire;
+			if (window.location.protocol === 'https:') {
+				document.cookie = `${expire}; secure`;
+			}
 			document.body.classList.remove('is-auth');
 			window.location.href = 'index.html';
 		});
@@ -86,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Si estás autenticado, evita volver al login
 	const path = window.location.pathname;
-	if (path.includes('login.html') && isAuthenticated()) {
+	if ((path.includes('login.html') || path === '/login' || path.startsWith('/login/')) && isAuthenticated()) {
 		window.location.href = 'aula.html';
 		return;
 	}

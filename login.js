@@ -38,8 +38,40 @@ if (window.location.hash === '#register') {
 	showRegister();
 }
 
+const getCookie = (name) => {
+	const part = document.cookie
+		.split('; ')
+		.find((x) => x.startsWith(`${encodeURIComponent(name)}=`));
+	if (!part) return '';
+	return decodeURIComponent(part.split('=').slice(1).join('='));
+};
+
+const safeLocalGet = (key) => {
+	try {
+		return localStorage.getItem(key);
+	} catch {
+		return null;
+	}
+};
+
+const safeLocalSet = (key, value) => {
+	try {
+		localStorage.setItem(key, value);
+	} catch {
+		// ignore (storage blocked)
+	}
+};
+
+const setAuthCookie = () => {
+	const base = `auth=1; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
+	document.cookie = base;
+	if (window.location.protocol === 'https:') {
+		document.cookie = `${base}; secure`;
+	}
+};
+
 // Si ya hay sesión iniciada, no mostrar login
-if (localStorage.getItem('auth') === '1') {
+if (safeLocalGet('auth') === '1' || getCookie('auth') === '1') {
 	window.location.href = 'aula.html';
 }
 
@@ -60,10 +92,14 @@ const readJsonSafe = async (response) => {
 
 const hintIfMissingApi = () => {
 	// Si abres el sitio como archivos estáticos (file:// o servidor simple), no existe /api/*
-	const isStatic = window.location.protocol === 'file:' || window.location.hostname === 'localhost';
-	return isStatic
-		? ' (Tip: /api/* solo funciona en Cloudflare Pages Functions o con wrangler pages dev)'
-		: '';
+	if (window.location.protocol === 'file:') {
+		return ' (Tip: /api/* solo funciona en Cloudflare Pages Functions o con wrangler pages dev)';
+	}
+	// En localhost, solo debería funcionar si estás usando Wrangler (normalmente :8788)
+	if (window.location.hostname === 'localhost' && window.location.port !== '8788') {
+		return ' (Tip: /api/* no funciona con servidores estáticos simples; usa wrangler pages dev .)';
+	}
+	return '';
 };
 
 loginFormElement.addEventListener('submit', async (event) => {
@@ -89,11 +125,12 @@ loginFormElement.addEventListener('submit', async (event) => {
 		}
 
 		setMessage(loginMessage, 'Sesión iniciada correctamente.', 'success');
-		localStorage.setItem('auth', '1');
-		localStorage.setItem('authBool', 'true');
-		if (data?.user?.name) localStorage.setItem('userName', data.user.name);
-		if (data?.user?.email) localStorage.setItem('userEmail', data.user.email);
-		if (!data?.user?.email && email) localStorage.setItem('userEmail', email);
+		setAuthCookie();
+		safeLocalSet('auth', '1');
+		safeLocalSet('authBool', 'true');
+		if (data?.user?.name) safeLocalSet('userName', data.user.name);
+		if (data?.user?.email) safeLocalSet('userEmail', data.user.email);
+		if (!data?.user?.email && email) safeLocalSet('userEmail', email);
 		window.location.href = 'aula.html';
 	} catch (error) {
 		setMessage(
