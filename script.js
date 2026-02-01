@@ -30,20 +30,37 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.body.classList.remove('is-auth');
 	}
 
+	// Remover botones según estado de sesión (no solo ocultar con CSS)
+	const loginBtn = document.querySelector('.btn-login');
+	const registerBtn = document.querySelector('.btn-register');
+	const logoutBtn = document.querySelector('.btn-logout');
+	if (isAuthenticated()) {
+		loginBtn?.remove();
+		registerBtn?.remove();
+	} else {
+		logoutBtn?.remove();
+	}
+
 	const logoutButtons = document.querySelectorAll('.btn-logout');
 	logoutButtons.forEach((btn) => {
 		btn.addEventListener('click', (event) => {
 			event.preventDefault();
 			localStorage.removeItem('auth');
 			document.body.classList.remove('is-auth');
-			window.location.href = '/';
+			window.location.href = 'index.html';
 		});
 	});
 
-	// Si estás en aula y no estás autenticado, redirigir al login
+	// Si estás autenticado, evita volver al login
 	const path = window.location.pathname;
+	if (path.includes('login.html') && isAuthenticated()) {
+		window.location.href = 'aula.html';
+		return;
+	}
+
+	// Si estás en aula y no estás autenticado, redirigir al login
 	if ((path.includes('/aula') || path.includes('aula.html')) && !isAuthenticated()) {
-		window.location.href = '/login';
+		window.location.href = 'login.html';
 	}
 });
 

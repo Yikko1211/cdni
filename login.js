@@ -38,6 +38,11 @@ if (window.location.hash === '#register') {
 	showRegister();
 }
 
+// Si ya hay sesión iniciada, no mostrar login
+if (localStorage.getItem('auth') === '1') {
+	window.location.href = 'aula.html';
+}
+
 const setMessage = (el, text, type) => {
 	el.textContent = text;
 	el.classList.remove('success', 'error');
@@ -66,7 +71,7 @@ loginFormElement.addEventListener('submit', async (event) => {
 
 		setMessage(loginMessage, 'Sesión iniciada correctamente.', 'success');
 		localStorage.setItem('auth', '1');
-		window.location.href = '/aula';
+		window.location.href = 'aula.html';
 	} catch (error) {
 		setMessage(loginMessage, 'Error de conexión. Intenta más tarde.', 'error');
 	}
