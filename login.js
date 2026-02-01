@@ -147,12 +147,29 @@ loginFormElement.addEventListener('submit', async (event) => {
 		if (data?.user?.email) safeLocalSet('userEmail', data.user.email);
 		if (!data?.user?.email && email) safeLocalSet('userEmail', email);
 		setMessageLink(loginMessage, 'Sesión iniciada. Si no te redirige, entra a', '/aula', 'Aula', 'success');
+		const target = new URL('/aula', window.location.origin).toString();
 		// Redirección confiable (replace evita volver atrás al login)
-		window.location.replace('/aula');
+		try {
+			window.location.replace(target);
+		} catch {
+			window.location.href = target;
+		}
+		// Si el login está embebido (iframe), intenta navegar el top-level
+		try {
+			if (window.top && window.top !== window) {
+				window.top.location.href = target;
+			}
+		} catch {
+			// ignore (cross-origin)
+		}
 		// Fallback por si algún navegador bloquea la navegación inmediata
 		setTimeout(() => {
-			if (window.location.pathname.includes('/login')) {
-				window.location.replace('/aula');
+			try {
+				if (window.location.pathname.includes('/login')) {
+					window.location.href = target;
+				}
+			} catch {
+				// ignore
 			}
 		}, 200);
 	} catch (error) {
