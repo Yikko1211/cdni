@@ -56,6 +56,16 @@ const getStoredProfile = () => {
 	return { grade, group };
 };
 
+const formatDateTime = (value) => {
+	const s = String(value || '').trim();
+	if (!s) return '';
+	// D1 devuelve strings tipo "2026-02-01 12:34:56".
+	const iso = s.includes('T') ? s : s.replace(' ', 'T') + 'Z';
+	const d = new Date(iso);
+	if (Number.isNaN(d.getTime())) return s;
+	return d.toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short' });
+};
+
 // Control de sesión simple
 const isAuthenticated = () => {
 	const cookieAuth = (getCookie('auth') || '').trim().toLowerCase();
@@ -212,8 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Render de materias en /aula/tareas (según grado)
 	const tasksContainer = document.getElementById('tasksByClass');
 	if (tasksContainer) {
-		const gradeStr = (localStorage.getItem('userGrade') || '').trim();
-		const grade = Number.parseInt(gradeStr, 10);
+		const { grade } = getStoredProfile();
 		const slugify = (text) => String(text)
 			.normalize('NFD')
 			.replace(/[\u0300-\u036f]/g, '')
@@ -293,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const noticeEl = document.getElementById('taskNotice');
 		if (!Number.isFinite(grade) || !subjectsByGrade[grade]) {
 			if (noticeEl) {
-				noticeEl.textContent = 'No se encontró tu grado. Vuelve a iniciar sesión y selecciona tu grado y grupo.';
+				noticeEl.textContent = 'No se encontró tu grado. Completa tu perfil para ver tus materias.';
 			}
 		} else {
 			if (noticeEl) {
@@ -386,6 +395,174 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (subject && subject !== 'Materia') {
 			document.title = `${subject} | Aula Virtual`;
 		}
+
+		// Cargar tareas reales
+		const tasksHost = document.getElementById('subjectTasks');
+		const tasksMsg = document.getElementById('tasksMessage');
+		const { grade, group } = getStoredProfile();
+		const email = (safeLocalGet('userEmail') || '').trim().toLowerCase();
+
+		const setTasksMsg = (text) => {
+			if (!tasksMsg) return;
+			tasksMsg.textContent = text || '';
+		};
+
+		const createBadge = (text, type) => {
+			const b = document.createElement('span');
+			b.className = `badge ${type}`;
+			b.textContent = text;
+			return b;
+		};
+
+		const renderTasks = (tasks) => {
+			if (!tasksHost) return;
+			tasksHost.innerHTML = '';
+			if (!Array.isArray(tasks) || tasks.length === 0) {
+				setTasksMsg('No hay tareas aún para esta materia.');
+				return;
+			}
+			setTasksMsg('');
+			tasks.forEach((t) => {
+				const item = document.createElement('div');
+				item.className = 'task-item';
+
+				const h3 = document.createElement('h3');
+				h3.textContent = t.title || 'Tarea';
+				item.appendChild(h3);
+
+				if (t.description) {
+					const p = document.createElement('p');
+					p.textContent = t.description;
+					item.appendChild(p);
+				}
+
+				const meta = document.createElement('div');
+				meta.className = 'task-meta';
+				if (t.submitted_at) {
+					meta.appendChild(createBadge('Entregado', 'ok'));
+					const when = document.createElement('span');
+					when.className = 'badge warn';
+					when.textContent = `Enviado: ${formatDateTime(t.submitted_at)}`;
+					meta.appendChild(when);
+				} else {
+					meta.appendChild(createBadge('Pendiente', 'warn'));
+				}
+				item.appendChild(meta);
+
+				if (t.submitted_file_url) {
+					const link = document.createElement('a');
+					link.href = t.submitted_file_url;
+					link.target = '_blank';
+					link.rel = 'noopener noreferrer';
+					link.textContent = 'Ver enlace entregado';
+					link.style.display = 'inline-block';
+					link.style.marginTop = '8px';
+					item.appendChild(link);
+				}
+
+				if (!t.submitted_at) {
+					const form = document.createElement('form');
+					form.className = 'deliver';
+
+					const ta = document.createElement('textarea');
+					ta.placeholder = 'Escribe tu respuesta (opcional)';
+					form.appendChild(ta);
+
+					const url = document.createElement('input');
+					url.type = 'url';
+					url.placeholder = 'Enlace de tu archivo (Drive/OneDrive)';
+					form.appendChild(url);
+
+					const btn = document.createElement('button');
+					btn.type = 'submit';
+					btn.className = 'btn';
+					btn.textContent = 'Entregar';
+					form.appendChild(btn);
+
+					const small = document.createElement('div');
+					small.className = 'task-note';
+					small.style.marginTop = '0px';
+					form.appendChild(small);
+
+					form.addEventListener('submit', async (e) => {
+						e.preventDefault();
+						small.textContent = '';
+						const answerText = ta.value.trim();
+						const fileUrl = url.value.trim();
+						if (!email) {
+							small.textContent = 'No se encontró tu correo. Vuelve a iniciar sesión.';
+							return;
+						}
+						if (!answerText && !fileUrl) {
+							small.textContent = 'Escribe una respuesta o pega un enlace.';
+							return;
+						}
+						btn.disabled = true;
+						btn.textContent = 'Enviando...';
+						try {
+							const res = await fetch('/api/submit', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ taskId: t.id, email, answerText, fileUrl })
+							});
+							const txt = await res.text();
+							let data;
+							try { data = JSON.parse(txt); } catch { data = { message: null, raw: txt }; }
+							if (!res.ok) {
+								small.textContent = data?.message || `No se pudo entregar (HTTP ${res.status}).`;
+								return;
+							}
+							small.textContent = 'Entregado. Actualizando…';
+							await loadTasks();
+						} catch {
+							small.textContent = 'Error de conexión. Intenta más tarde.';
+						} finally {
+							btn.disabled = false;
+							btn.textContent = 'Entregar';
+						}
+					});
+
+					item.appendChild(form);
+				}
+
+				tasksHost.appendChild(item);
+			});
+		};
+
+		const loadTasks = async () => {
+			if (!tasksHost) return;
+			if (!slug) {
+				setTasksMsg('Materia inválida.');
+				return;
+			}
+			if (!grade) {
+				setTasksMsg('Completa tu perfil para ver tus tareas.');
+				return;
+			}
+			setTasksMsg('Cargando tareas…');
+			try {
+				const qs = new URLSearchParams({
+					subject: slug,
+					grade: String(grade),
+					group: group || '',
+					email: email || ''
+				});
+				const res = await fetch(`/api/tasks?${qs.toString()}`);
+				const txt = await res.text();
+				let data;
+				try { data = JSON.parse(txt); } catch { data = { message: null, raw: txt }; }
+				if (!res.ok) {
+					setTasksMsg(data?.message || `No se pudieron cargar las tareas (HTTP ${res.status}).`);
+					return;
+				}
+				renderTasks(data?.tasks || []);
+			} catch {
+				setTasksMsg('Error de conexión cargando tareas.');
+			}
+		};
+
+		// Disparar carga
+		loadTasks();
 	}
 
 	// Si estás autenticado, evita volver al login
