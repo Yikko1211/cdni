@@ -77,9 +77,17 @@ body.is-auth .nav-actions .btn-logout {
 }
 
 /* En páginas con fondo claro (p.ej. submódulos del aula), el outline blanco se ve invisible */
-.module-actions .btn.btn-outline {
+.aula-page .module-actions .btn.btn-outline {
 	color: var(--primary);
 	border-color: var(--primary);
+}
+
+.aula-page .module-actions .btn.btn-outline:hover {
+	background-color: var(--primary);
+	color: var(--white);
+	border-color: var(--primary);
+	box-shadow: none;
+	transform: translateY(-2px);
 }
 
 .btn.btn-solid {
