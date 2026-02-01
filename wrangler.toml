@@ -1,0 +1,11 @@
+name = "cdni"
+compatibility_date = "2026-01-31"
+
+# Para Cloudflare Pages (sirve los .html desde la raíz)
+pages_build_output_dir = "."
+
+# D1 (reemplaza database_id por el ID real de tu D1)
+[[d1_databases]]
+binding = "DB"
+database_name = "prepa_db"
+database_id = "REEMPLAZA_CON_TU_DATABASE_ID"

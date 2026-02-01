@@ -49,6 +49,23 @@ const setMessage = (el, text, type) => {
 	if (type) el.classList.add(type);
 };
 
+const readJsonSafe = async (response) => {
+	const text = await response.text();
+	try {
+		return JSON.parse(text);
+	} catch {
+		return { message: null, raw: text };
+	}
+};
+
+const hintIfMissingApi = () => {
+	// Si abres el sitio como archivos estáticos (file:// o servidor simple), no existe /api/*
+	const isStatic = window.location.protocol === 'file:' || window.location.hostname === 'localhost';
+	return isStatic
+		? ' (Tip: /api/* solo funciona en Cloudflare Pages Functions o con wrangler pages dev)'
+		: '';
+};
+
 loginFormElement.addEventListener('submit', async (event) => {
 	event.preventDefault();
 	setMessage(loginMessage, '', null);
@@ -62,10 +79,12 @@ loginFormElement.addEventListener('submit', async (event) => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email, password })
 		});
-		const data = await response.json();
+		const data = await readJsonSafe(response);
 
 		if (!response.ok) {
-			setMessage(loginMessage, data.message || 'No se pudo iniciar sesión.', 'error');
+			const msg = data?.message
+				|| `No se pudo iniciar sesión (HTTP ${response.status}).${hintIfMissingApi()}`;
+			setMessage(loginMessage, msg, 'error');
 			return;
 		}
 
@@ -76,7 +95,11 @@ loginFormElement.addEventListener('submit', async (event) => {
 		if (!data?.user?.email && email) localStorage.setItem('userEmail', email);
 		window.location.href = 'aula.html';
 	} catch (error) {
-		setMessage(loginMessage, 'Error de conexión. Intenta más tarde.', 'error');
+		setMessage(
+			loginMessage,
+			`Error de conexión. Intenta más tarde.${hintIfMissingApi()}`,
+			'error'
+		);
 	}
 });
 
@@ -94,16 +117,22 @@ registerFormElement.addEventListener('submit', async (event) => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ name, email, password })
 		});
-		const data = await response.json();
+		const data = await readJsonSafe(response);
 
 		if (!response.ok) {
-			setMessage(registerMessage, data.message || 'No se pudo registrar.', 'error');
+			const msg = data?.message
+				|| `No se pudo registrar (HTTP ${response.status}).${hintIfMissingApi()}`;
+			setMessage(registerMessage, msg, 'error');
 			return;
 		}
 
 		setMessage(registerMessage, 'Registro exitoso. Ya puedes iniciar sesión.', 'success');
 		showLogin();
 	} catch (error) {
-		setMessage(registerMessage, 'Error de conexión. Intenta más tarde.', 'error');
+		setMessage(
+			registerMessage,
+			`Error de conexión. Intenta más tarde.${hintIfMissingApi()}`,
+			'error'
+		);
 	}
 });

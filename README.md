@@ -1,20 +1,36 @@
 # Sitio Colegio Abraham Lincoln
 
-Sitio estático simple para la Preparatoria y Universidad "Abraham Lincoln" en Tampico, Tamaulipas.
+Sitio con páginas estáticas (.html) + autenticación usando **Cloudflare Pages Functions** y **D1**.
 
-Archivos principales:
-- `index.html` — página principal
-- `about.html` — sobre la institución
-- `admissions.html` — información de admisiones
-- `contact.html` — contacto
-- `css/styles.css` — estilos
-- `assets/logo.svg` — logo de ejemplo
+## Importante
 
-Abrir en el navegador:
+El login/registro hace `fetch('/api/login')` y `fetch('/api/register')`.
+Eso **NO funciona** si abres los HTML como archivos (`file://`) o con un servidor estático simple (por ejemplo `py -m http.server`), porque ahí no existen las rutas `/api/*`.
 
-Windows:
+## Correr en local (con API + D1)
+
+Requisitos:
+- Node.js
+- Wrangler
+
+Instalar Wrangler:
 ```
-start index.html
+npm i -g wrangler
 ```
 
-O abrir `index.html` desde el explorador de archivos.
+Luego:
+```
+wrangler pages dev .
+```
+
+Abrir la URL que imprima Wrangler (normalmente `http://localhost:8788`).
+
+## D1
+
+El binding se llama `DB` y la base es `prepa_db`.
+En [wrangler.toml](wrangler.toml) reemplaza `database_id` por el ID real de tu D1.
+
+## Deploy
+
+Publica como **Cloudflare Pages** (incluyendo la carpeta `functions/`).
+Configura el binding D1 `DB` en el proyecto de Pages (o usando `wrangler.toml`).
