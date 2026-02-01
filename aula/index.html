@@ -35,6 +35,11 @@
             text-align: center;
             transition: transform 0.3s, box-shadow 0.3s;
         }
+        a.aula-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
         .aula-card:hover {
             transform: translateY(-6px);
             box-shadow: 0 18px 35px rgba(0,0,0,0.1);
@@ -84,31 +89,31 @@
     </section>
 
     <section class="aula-grid">
-        <div class="aula-card">
+        <a class="aula-card" href="/aula/tareas/" aria-label="Ir a Tareas">
             <i class="fas fa-book"></i>
             <h3>Tareas</h3>
             <p>Consulta y entrega tus actividades.</p>
-        </div>
-        <div class="aula-card">
+        </a>
+        <a class="aula-card" href="/aula/anuncios/" aria-label="Ir a Anuncios">
             <i class="fas fa-bullhorn"></i>
             <h3>Anuncios</h3>
             <p>Entérate de lo más importante.</p>
-        </div>
-        <div class="aula-card">
+        </a>
+        <a class="aula-card" href="/aula/mensajes/" aria-label="Ir a Mensajes">
             <i class="fas fa-envelope"></i>
             <h3>Mensajes</h3>
             <p>Comunicación directa con docentes.</p>
-        </div>
-        <div class="aula-card">
+        </a>
+        <a class="aula-card" href="/aula/pagos/" aria-label="Ir a Pagos">
             <i class="fas fa-credit-card"></i>
             <h3>Pagos</h3>
             <p>Consulta tu estado de cuenta.</p>
-        </div>
-        <div class="aula-card">
+        </a>
+        <a class="aula-card" href="/aula/calificaciones/" aria-label="Ir a Calificaciones">
             <i class="fas fa-chart-line"></i>
             <h3>Calificaciones</h3>
             <p>Revisa tu progreso académico.</p>
-        </div>
+        </a>
     </section>
 
     <div class="aula-actions">

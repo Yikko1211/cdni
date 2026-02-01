@@ -1,6 +1,21 @@
 /aula /aula/index.html 200
 /aula/ /aula/index.html 200
 
+/aula/tareas /aula/tareas/index.html 200
+/aula/tareas/ /aula/tareas/index.html 200
+
+/aula/anuncios /aula/anuncios/index.html 200
+/aula/anuncios/ /aula/anuncios/index.html 200
+
+/aula/mensajes /aula/mensajes/index.html 200
+/aula/mensajes/ /aula/mensajes/index.html 200
+
+/aula/pagos /aula/pagos/index.html 200
+/aula/pagos/ /aula/pagos/index.html 200
+
+/aula/calificaciones /aula/calificaciones/index.html 200
+/aula/calificaciones/ /aula/calificaciones/index.html 200
+
 /login /login/index.html 200
 /login/ /login/index.html 200
 
