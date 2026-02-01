@@ -33,8 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		btn.addEventListener('click', (event) => {
 			event.preventDefault();
 			localStorage.removeItem('auth');
-			window.location.assign('/');
+			document.body.classList.remove('is-auth');
+			window.location.assign('index.html');
 		});
 	});
+
+	// Si estás en aula.html y no estás autenticado, redirigir al login
+	if (window.location.pathname.includes('aula.html') && !isAuthenticated()) {
+		window.location.assign('login.html');
+	}
 });
 
