@@ -26,6 +26,8 @@ const isAuthenticated = () => localStorage.getItem('auth') === '1';
 document.addEventListener('DOMContentLoaded', () => {
 	if (isAuthenticated()) {
 		document.body.classList.add('is-auth');
+	} else {
+		document.body.classList.remove('is-auth');
 	}
 
 	const logoutButtons = document.querySelectorAll('.btn-logout');
@@ -34,13 +36,14 @@ document.addEventListener('DOMContentLoaded', () => {
 			event.preventDefault();
 			localStorage.removeItem('auth');
 			document.body.classList.remove('is-auth');
-			window.location.assign('index.html');
+			window.location.href = '/';
 		});
 	});
 
-	// Si estás en aula.html y no estás autenticado, redirigir al login
-	if (window.location.pathname.includes('aula.html') && !isAuthenticated()) {
-		window.location.assign('login.html');
+	// Si estás en aula y no estás autenticado, redirigir al login
+	const path = window.location.pathname;
+	if ((path.includes('/aula') || path.includes('aula.html')) && !isAuthenticated()) {
+		window.location.href = '/login';
 	}
 });
 
