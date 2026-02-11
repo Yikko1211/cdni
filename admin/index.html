@@ -117,8 +117,40 @@
                         <strong style="color:var(--primary); font-size:0.88rem;"><i class="fas fa-book"></i> Materia a asignar (opcional)</strong>
                     </div>
                     <div class="form-group">
-                        <label>Materia (slug)</label>
-                        <input type="text" id="inviteSubject" placeholder="ej. algebra, ingles-1, historia">
+                        <label>Materia</label>
+                        <select id="inviteSubject">
+                            <option value="">— Seleccionar —</option>
+                            <option value="matematicas">Matemáticas</option>
+                            <option value="algebra">Álgebra</option>
+                            <option value="calculo">Cálculo</option>
+                            <option value="geometria">Geometría</option>
+                            <option value="estadistica">Estadística</option>
+                            <option value="fisica">Física</option>
+                            <option value="quimica">Química</option>
+                            <option value="biologia">Biología</option>
+                            <option value="ecologia">Ecología</option>
+                            <option value="anatomia">Anatomía</option>
+                            <option value="espanol">Español</option>
+                            <option value="literatura">Literatura</option>
+                            <option value="lectura-redaccion">Lectura y Redacción</option>
+                            <option value="ingles">Inglés</option>
+                            <option value="historia-mexico">Historia de México</option>
+                            <option value="historia-universal">Historia Universal</option>
+                            <option value="filosofia">Filosofía</option>
+                            <option value="etica">Ética y Valores</option>
+                            <option value="logica">Lógica</option>
+                            <option value="derecho">Derecho</option>
+                            <option value="economia">Economía</option>
+                            <option value="sociologia">Sociología</option>
+                            <option value="psicologia">Psicología</option>
+                            <option value="metodologia">Metodología</option>
+                            <option value="informatica">Informática</option>
+                            <option value="educacion-fisica">Educación Física</option>
+                            <option value="artes">Artes</option>
+                            <option value="orientacion">Orientación</option>
+                            <option value="administracion">Administración</option>
+                            <option value="contabilidad">Contabilidad</option>
+                        </select>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                         <div class="form-group">
@@ -159,8 +191,40 @@
             <form id="assignForm">
                 <input type="hidden" id="assignTeacherId">
                 <div class="form-group">
-                    <label>Materia (slug)</label>
-                    <input type="text" id="assignSubject" placeholder="ej. algebra, ingles-1" required>
+                    <label>Materia</label>
+                    <select id="assignSubject" required>
+                        <option value="">— Seleccionar —</option>
+                        <option value="matematicas">Matemáticas</option>
+                        <option value="algebra">Álgebra</option>
+                        <option value="calculo">Cálculo</option>
+                        <option value="geometria">Geometría</option>
+                        <option value="estadistica">Estadística</option>
+                        <option value="fisica">Física</option>
+                        <option value="quimica">Química</option>
+                        <option value="biologia">Biología</option>
+                        <option value="ecologia">Ecología</option>
+                        <option value="anatomia">Anatomía</option>
+                        <option value="espanol">Español</option>
+                        <option value="literatura">Literatura</option>
+                        <option value="lectura-redaccion">Lectura y Redacción</option>
+                        <option value="ingles">Inglés</option>
+                        <option value="historia-mexico">Historia de México</option>
+                        <option value="historia-universal">Historia Universal</option>
+                        <option value="filosofia">Filosofía</option>
+                        <option value="etica">Ética y Valores</option>
+                        <option value="logica">Lógica</option>
+                        <option value="derecho">Derecho</option>
+                        <option value="economia">Economía</option>
+                        <option value="sociologia">Sociología</option>
+                        <option value="psicologia">Psicología</option>
+                        <option value="metodologia">Metodología</option>
+                        <option value="informatica">Informática</option>
+                        <option value="educacion-fisica">Educación Física</option>
+                        <option value="artes">Artes</option>
+                        <option value="orientacion">Orientación</option>
+                        <option value="administracion">Administración</option>
+                        <option value="contabilidad">Contabilidad</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Grado (1-6)</label>
@@ -212,6 +276,11 @@
             return r.json();
         };
 
+        // Mapa de slugs → nombres legibles
+        const subjectNames = {};
+        document.querySelectorAll('#inviteSubject option').forEach(o => { if (o.value) subjectNames[o.value] = o.textContent; });
+        const subjectLabel = (slug) => subjectNames[slug] || slug;
+
         // Ocultar campos de materia si se selecciona Admin
         const inviteRoleSel = document.getElementById('inviteRole');
         const subjectFields = document.getElementById('subjectFields');
@@ -254,9 +323,9 @@
             const data = await api('invite', 'POST', payload);
             if (data.link) {
                 const fullLink = window.location.origin + data.link;
-                const subjectLabel = invSubject ? ` · Materia: ${invSubject} ${invGrade ? invGrade + '°' : ''} ${invGroup || 'Todos'}` : '';
+                const subjectLabel2 = invSubject ? ` · Materia: ${subjectLabel(invSubject)} ${invGrade ? invGrade + '°' : ''} ${invGroup || 'Todos'}` : '';
                 resEl.innerHTML = `
-                    <div class="msg ok"><i class="fas fa-check-circle"></i> ${data.message}${subjectLabel}</div>
+                    <div class="msg ok"><i class="fas fa-check-circle"></i> ${data.message}${subjectLabel2}</div>
                     <div class="invite-link">
                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                             <span style="flex:1; min-width:0;"><i class="fas fa-link"></i> <a href="${fullLink}" target="_blank">${fullLink}</a></span>
@@ -285,7 +354,7 @@
             let html = `<table class="admin-table"><thead><tr><th>Email</th><th>Rol</th><th>Materia</th><th>Estado</th><th>Link</th><th></th></tr></thead><tbody>`;
             data.invitations.forEach(i => {
                 const status = i.used_at ? '<span style="color:green">✓ Usada</span>' : (new Date(i.expires_at) < new Date() ? '<span style="color:red">Expirada</span>' : '<span style="color:#c5a059">Pendiente</span>');
-                const subject = i.subject_slug ? `${i.subject_slug} ${i.subject_grade || ''}° ${i.subject_group || 'Todos'}` : '—';
+                const subject = i.subject_slug ? `${subjectLabel(i.subject_slug)} ${i.subject_grade || ''}° ${i.subject_group || 'Todos'}` : '—';
                 const link = window.location.origin + '/login/#invite=' + i.token;
                 const linkBtn = !i.used_at ? `<button class="btn-admin small primary" onclick="copyLink('${link}')" title="Copiar link"><i class="fas fa-copy"></i></button>` : '';
                 html += `<tr><td>${i.email}</td><td>${i.role}</td><td>${subject}</td><td>${status}</td><td>${linkBtn}</td><td>${!i.used_at ? `<button class="btn-admin small danger" onclick="delInvite(${i.id})">×</button>` : ''}</td></tr>`;
@@ -340,7 +409,7 @@
             const data = await fetch(`/api/admin?action=teacher_subjects&teacher_id=${teacherId}&admin_email=${encodeURIComponent(email())}`).then(r => r.json());
             const list = document.getElementById('assignedList');
             if (!data.subjects || data.subjects.length === 0) { list.innerHTML = '<p style="color:#888;">Ninguna aún.</p>'; return; }
-            list.innerHTML = data.subjects.map(s => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>${s.subject_slug} — ${s.grade}° ${s.group_code || 'Todos'}</span> <button class="btn-admin small danger" onclick="delSubject(${s.id}, ${teacherId}, '${name}')">×</button></div>`).join('');
+            list.innerHTML = data.subjects.map(s => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>${subjectLabel(s.subject_slug)} — ${s.grade}° ${s.group_code || 'Todos'}</span> <button class="btn-admin small danger" onclick="delSubject(${s.id}, ${teacherId}, '${name}')">×</button></div>`).join('');
         };
 
         document.getElementById('assignForm').addEventListener('submit', async (e) => {
