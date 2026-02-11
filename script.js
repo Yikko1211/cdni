@@ -187,10 +187,14 @@ const isAuthenticated = () => {
 		initMobileNav();
 	const urls = { home: '/', login: '/login/', aula: '/aula' };
 	const authed = isAuthenticated();
+	const userRole = (safeLocalGet('userRole') || 'student').trim().toLowerCase();
 	if (authed) {
 		document.body.classList.add('is-auth');
+		// Agregar clase de rol al body
+		document.body.classList.add(`is-role-${userRole}`);
 	} else {
 		document.body.classList.remove('is-auth');
+		document.body.classList.remove('is-role-admin', 'is-role-teacher', 'is-role-student');
 	}
 
 	// Renderizar acciones del header según sesión (evita que se vean botones incorrectos)
@@ -198,6 +202,16 @@ const isAuthenticated = () => {
 	if (navActions) {
 		navActions.innerHTML = '';
 		if (authed) {
+			// Botón Admin (solo admin)
+			navActions.insertAdjacentHTML(
+				'beforeend',
+				'<a class="btn btn-accent btn-panel btn-admin-panel" href="/admin/"><i class="fas fa-shield-alt"></i> Admin</a>'
+			);
+			// Botón Maestro (teacher y admin)
+			navActions.insertAdjacentHTML(
+				'beforeend',
+				'<a class="btn btn-outline btn-panel btn-teacher-panel" href="/maestro/"><i class="fas fa-chalkboard-teacher"></i> Maestro</a>'
+			);
 			navActions.insertAdjacentHTML(
 				'beforeend',
 				`<a class="btn btn-outline btn-aula" href="${urls.aula}">Aula</a>`
@@ -236,7 +250,7 @@ const isAuthenticated = () => {
 		if (window.location.protocol === 'https:') {
 			document.cookie = `${expire}; secure`;
 		}
-		document.body.classList.remove('is-auth');
+		document.body.classList.remove('is-auth', 'is-role-admin', 'is-role-teacher', 'is-role-student');
 		window.location.href = urls.home;
 	};
 

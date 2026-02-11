@@ -102,6 +102,23 @@ header.scrolled {
 .btn-aula { display: none; }
 body.is-auth .nav-actions .btn-aula { display: inline-flex; }
 
+/* Botones de panel Admin / Maestro: ocultos por defecto, visibles con rol */
+.btn-panel { display: none; }
+body.is-role-admin .nav-actions .btn-admin-panel { display: inline-flex; }
+body.is-role-teacher .nav-actions .btn-teacher-panel { display: inline-flex; }
+body.is-role-admin .nav-actions .btn-teacher-panel { display: inline-flex; }
+
+.btn.btn-accent {
+	background: var(--secondary);
+	color: var(--primary);
+	border: 2px solid var(--secondary);
+	font-weight: 600;
+}
+.btn.btn-accent:hover {
+	background: transparent;
+	color: var(--secondary);
+}
+
 .btn-logout { display: none; }
 
 body.is-auth .nav-actions .btn-login,
