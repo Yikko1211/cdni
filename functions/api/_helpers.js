@@ -65,11 +65,17 @@ export const ensureSchema = async (DB) => {
 			created_by INTEGER NOT NULL,
 			expires_at TEXT NOT NULL,
 			used_at TEXT,
+			subject_slug TEXT,
+			subject_grade INTEGER,
+			subject_group TEXT,
 			FOREIGN KEY (created_by) REFERENCES users(id)
 		);
 		CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token);
 	`);
 	try { await DB.prepare('ALTER TABLE tasks ADD COLUMN teacher_id INTEGER').run(); } catch {}
+	try { await DB.prepare('ALTER TABLE invitations ADD COLUMN subject_slug TEXT').run(); } catch {}
+	try { await DB.prepare('ALTER TABLE invitations ADD COLUMN subject_grade INTEGER').run(); } catch {}
+	try { await DB.prepare('ALTER TABLE invitations ADD COLUMN subject_group TEXT').run(); } catch {}
 };
 
 // Verifica que el usuario autenticado tenga el role esperado

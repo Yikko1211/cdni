@@ -6,7 +6,7 @@
     <title>Panel Admin | Instituto Abraham Lincoln</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/style.css?v=20260211-2">
+    <link rel="stylesheet" href="/style.css?v=20260211-3">
     <style>
         .admin-page { padding-top: 100px; background: #f4f4f4; min-height: 100vh; }
         .admin-hero { padding: 30px 6% 10px; }
@@ -99,7 +99,7 @@
     <section class="admin-section" id="tab-invite">
         <div class="admin-card">
             <h3><i class="fas fa-paper-plane"></i> Crear Invitación</h3>
-            <p style="color:#666; margin-bottom:14px; font-size:0.88rem;">Genera un link de invitación. El maestro lo abre, crea su contraseña y queda activo.</p>
+            <p style="color:#666; margin-bottom:14px; font-size:0.88rem;">Genera un link de invitación. El maestro lo abre, crea su contraseña y queda activo con su materia pre-asignada.</p>
             <form id="inviteForm">
                 <div class="form-group">
                     <label>Correo del maestro</label>
@@ -112,7 +112,29 @@
                         <option value="admin">Admin</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-admin primary">Crear Invitación</button>
+                <div id="subjectFields">
+                    <div style="border-top:1px solid #eee; margin:14px 0 10px; padding-top:12px;">
+                        <strong style="color:var(--primary); font-size:0.88rem;"><i class="fas fa-book"></i> Materia a asignar (opcional)</strong>
+                    </div>
+                    <div class="form-group">
+                        <label>Materia (slug)</label>
+                        <input type="text" id="inviteSubject" placeholder="ej. algebra, ingles-1, historia">
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div class="form-group">
+                            <label>Grado (1-6)</label>
+                            <input type="number" id="inviteGrade" min="1" max="6" placeholder="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Grupo</label>
+                            <select id="inviteGroup">
+                                <option value="">Todos</option>
+                                <option>A</option><option>B</option><option>C</option><option>D</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-admin primary"><i class="fas fa-paper-plane"></i> Crear Invitación</button>
             </form>
             <div id="inviteResult"></div>
         </div>
@@ -161,7 +183,7 @@
         </div>
     </div>
 
-    <script src="/script.js?v=20260211-2"></script>
+    <script src="/script.js?v=20260211-3"></script>
     <script>
     (() => {
         const email = () => (localStorage.getItem('userEmail') || '').trim().toLowerCase();
@@ -190,6 +212,13 @@
             return r.json();
         };
 
+        // Ocultar campos de materia si se selecciona Admin
+        const inviteRoleSel = document.getElementById('inviteRole');
+        const subjectFields = document.getElementById('subjectFields');
+        inviteRoleSel.addEventListener('change', () => {
+            subjectFields.style.display = inviteRoleSel.value === 'admin' ? 'none' : 'block';
+        });
+
         // --- Maestros ---
         const loadTeachers = async () => {
             const el = document.getElementById('teachersList');
@@ -215,24 +244,51 @@
             resEl.innerHTML = '';
             const invEmail = document.getElementById('inviteEmail').value.trim();
             const invRole = document.getElementById('inviteRole').value;
-            const data = await api('invite', 'POST', { email: invEmail, role: invRole });
+            const invSubject = document.getElementById('inviteSubject').value.trim();
+            const invGrade = document.getElementById('inviteGrade').value;
+            const invGroup = document.getElementById('inviteGroup').value;
+            const payload = { email: invEmail, role: invRole };
+            if (invSubject) payload.subject_slug = invSubject;
+            if (invGrade) payload.subject_grade = Number(invGrade);
+            if (invGroup) payload.subject_group = invGroup;
+            const data = await api('invite', 'POST', payload);
             if (data.link) {
                 const fullLink = window.location.origin + data.link;
-                resEl.innerHTML = `<div class="msg ok">${data.message}</div><div class="invite-link">Link: <a href="${fullLink}" target="_blank">${fullLink}</a><br><small>Válido 48 horas. Envíalo al maestro.</small></div>`;
+                const subjectLabel = invSubject ? ` · Materia: ${invSubject} ${invGrade ? invGrade + '°' : ''} ${invGroup || 'Todos'}` : '';
+                resEl.innerHTML = `
+                    <div class="msg ok"><i class="fas fa-check-circle"></i> ${data.message}${subjectLabel}</div>
+                    <div class="invite-link">
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <span style="flex:1; min-width:0;"><i class="fas fa-link"></i> <a href="${fullLink}" target="_blank">${fullLink}</a></span>
+                            <button type="button" class="btn-admin small primary" onclick="copyLink('${fullLink}')"><i class="fas fa-copy"></i> Copiar</button>
+                        </div>
+                        <small style="color:#666; margin-top:6px; display:block;">Válido 48 horas. Envíalo al maestro para que se registre.</small>
+                    </div>`;
+                document.getElementById('inviteForm').reset();
                 loadInvitations();
             } else {
-                resEl.innerHTML = `<div class="msg err">${data.message || 'Error'}</div>`;
+                resEl.innerHTML = `<div class="msg err"><i class="fas fa-exclamation-circle"></i> ${data.message || 'Error'}</div>`;
             }
         });
+
+        window.copyLink = (link) => {
+            navigator.clipboard.writeText(link).then(() => {
+                const btn = event.target.closest('button');
+                if (btn) { const orig = btn.innerHTML; btn.innerHTML = '<i class="fas fa-check"></i> Copiado'; setTimeout(() => btn.innerHTML = orig, 2000); }
+            }).catch(() => { prompt('Copia este link:', link); });
+        };
 
         const loadInvitations = async () => {
             const el = document.getElementById('invitationsList');
             const data = await api('invitations');
             if (!data.invitations || data.invitations.length === 0) { el.innerHTML = '<p style="color:#888;">Ninguna invitación.</p>'; return; }
-            let html = `<table class="admin-table"><thead><tr><th>Email</th><th>Rol</th><th>Expira</th><th>Estado</th><th></th></tr></thead><tbody>`;
+            let html = `<table class="admin-table"><thead><tr><th>Email</th><th>Rol</th><th>Materia</th><th>Estado</th><th>Link</th><th></th></tr></thead><tbody>`;
             data.invitations.forEach(i => {
-                const status = i.used_at ? '<span style="color:green">✓ Usada</span>' : (new Date(i.expires_at) < new Date() ? '<span style="color:red">Expirada</span>' : 'Pendiente');
-                html += `<tr><td>${i.email}</td><td>${i.role}</td><td>${(i.expires_at || '').slice(0, 16).replace('T', ' ')}</td><td>${status}</td><td>${!i.used_at ? `<button class="btn-admin small danger" onclick="delInvite(${i.id})">×</button>` : ''}</td></tr>`;
+                const status = i.used_at ? '<span style="color:green">✓ Usada</span>' : (new Date(i.expires_at) < new Date() ? '<span style="color:red">Expirada</span>' : '<span style="color:#c5a059">Pendiente</span>');
+                const subject = i.subject_slug ? `${i.subject_slug} ${i.subject_grade || ''}° ${i.subject_group || 'Todos'}` : '—';
+                const link = window.location.origin + '/login/#invite=' + i.token;
+                const linkBtn = !i.used_at ? `<button class="btn-admin small primary" onclick="copyLink('${link}')" title="Copiar link"><i class="fas fa-copy"></i></button>` : '';
+                html += `<tr><td>${i.email}</td><td>${i.role}</td><td>${subject}</td><td>${status}</td><td>${linkBtn}</td><td>${!i.used_at ? `<button class="btn-admin small danger" onclick="delInvite(${i.id})">×</button>` : ''}</td></tr>`;
             });
             html += '</tbody></table>';
             el.innerHTML = html;

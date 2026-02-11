@@ -39,7 +39,9 @@ export async function onRequest({ request, env }) {
 		}
 		if (action === 'invitations') {
 			const rows = await env.DB.prepare(
-				`SELECT i.id, i.token, i.email, i.role, i.expires_at, i.used_at, u.name AS created_by_name
+				`SELECT i.id, i.token, i.email, i.role, i.expires_at, i.used_at,
+				        i.subject_slug, i.subject_grade, i.subject_group,
+				        u.name AS created_by_name
 				 FROM invitations i
 				 LEFT JOIN users u ON u.id = i.created_by
 				 ORDER BY i.id DESC`
@@ -65,6 +67,9 @@ export async function onRequest({ request, env }) {
 		if (action === 'invite') {
 			const email = (body.email || '').trim().toLowerCase();
 			const role = body.role || 'teacher';
+			const subjectSlug = (body.subject_slug || '').trim().toLowerCase() || null;
+			const subjectGrade = body.subject_grade ? Number(body.subject_grade) : null;
+			const subjectGroup = (body.subject_group || '').trim().toUpperCase() || null;
 			if (!email) return jsonResponse(400, { message: 'Email requerido.' });
 			if (!['teacher', 'admin'].includes(role)) return jsonResponse(400, { message: 'Role inválido.' });
 			const existing = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
@@ -72,11 +77,11 @@ export async function onRequest({ request, env }) {
 			const token = generateToken();
 			const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
 			await env.DB.prepare(
-				`INSERT INTO invitations (token, email, role, created_by, expires_at) VALUES (?, ?, ?, ?, ?)`
-			).bind(token, email, role, admin.id, expiresAt).run();
+				`INSERT INTO invitations (token, email, role, created_by, expires_at, subject_slug, subject_grade, subject_group) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+			).bind(token, email, role, admin.id, expiresAt, subjectSlug, subjectGrade, subjectGroup).run();
 			return jsonResponse(201, {
 				message: 'Invitación creada.',
-				invitation: { token, email, role, expires_at: expiresAt },
+				invitation: { token, email, role, expires_at: expiresAt, subject_slug: subjectSlug, subject_grade: subjectGrade, subject_group: subjectGroup },
 				link: `/login/#invite=${token}`
 			});
 		}

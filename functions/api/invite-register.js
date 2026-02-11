@@ -17,7 +17,7 @@ export async function onRequestPost({ request, env }) {
 	if (!password || password.length < 6) return jsonResponse(400, { message: 'Contraseña de al menos 6 caracteres requerida.' });
 
 	const inv = await env.DB.prepare(
-		`SELECT id, email, role, expires_at, used_at FROM invitations WHERE token = ?`
+		`SELECT id, email, role, expires_at, used_at, subject_slug, subject_grade, subject_group FROM invitations WHERE token = ?`
 	).bind(token).first();
 
 	if (!inv) return jsonResponse(404, { message: 'Invitación no encontrada.' });
@@ -38,11 +38,17 @@ export async function onRequestPost({ request, env }) {
 
 	await env.DB.prepare('UPDATE invitations SET used_at = datetime("now") WHERE id = ?').bind(inv.id).run();
 
-	// Si es teacher, crear perfil vacío
+	// Si es teacher, crear perfil vacío y asignar materia si se definió en la invitación
 	if (inv.role === 'teacher') {
 		const user = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(inv.email).first();
 		if (user) {
 			await env.DB.prepare('INSERT OR IGNORE INTO teacher_profiles (user_id) VALUES (?)').bind(user.id).run();
+			// Auto-asignar materia si viene en la invitación
+			if (inv.subject_slug && inv.subject_grade) {
+				await env.DB.prepare(
+					'INSERT OR IGNORE INTO teacher_subjects (teacher_id, subject_slug, grade, group_code) VALUES (?, ?, ?, ?)'
+				).bind(user.id, inv.subject_slug, inv.subject_grade, inv.subject_group || null).run();
+			}
 		}
 	}
 
