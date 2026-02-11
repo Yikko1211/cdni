@@ -114,43 +114,7 @@
                 </div>
                 <div id="subjectFields">
                     <div style="border-top:1px solid #eee; margin:14px 0 10px; padding-top:12px;">
-                        <strong style="color:var(--primary); font-size:0.88rem;"><i class="fas fa-book"></i> Materia a asignar</strong>
-                    </div>
-                    <div class="form-group">
-                        <label>Materia</label>
-                        <select id="inviteSubject">
-                            <option value="">— Seleccionar —</option>
-                            <option value="matematicas">Matemáticas</option>
-                            <option value="algebra">Álgebra</option>
-                            <option value="calculo">Cálculo</option>
-                            <option value="geometria">Geometría</option>
-                            <option value="estadistica">Estadística</option>
-                            <option value="fisica">Física</option>
-                            <option value="quimica">Química</option>
-                            <option value="biologia">Biología</option>
-                            <option value="ecologia">Ecología</option>
-                            <option value="anatomia">Anatomía</option>
-                            <option value="espanol">Español</option>
-                            <option value="literatura">Literatura</option>
-                            <option value="lectura-redaccion">Lectura y Redacción</option>
-                            <option value="ingles">Inglés</option>
-                            <option value="historia-mexico">Historia de México</option>
-                            <option value="historia-universal">Historia Universal</option>
-                            <option value="filosofia">Filosofía</option>
-                            <option value="etica">Ética y Valores</option>
-                            <option value="logica">Lógica</option>
-                            <option value="derecho">Derecho</option>
-                            <option value="economia">Economía</option>
-                            <option value="sociologia">Sociología</option>
-                            <option value="psicologia">Psicología</option>
-                            <option value="metodologia">Metodología</option>
-                            <option value="informatica">Informática</option>
-                            <option value="educacion-fisica">Educación Física</option>
-                            <option value="artes">Artes</option>
-                            <option value="orientacion">Orientación</option>
-                            <option value="administracion">Administración</option>
-                            <option value="contabilidad">Contabilidad</option>
-                        </select>
+                        <strong style="color:var(--primary); font-size:0.88rem;"><i class="fas fa-book"></i> Materia a asignar (maestros)</strong>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                         <div class="form-group">
@@ -172,6 +136,12 @@
                                 <option>A</option><option>B</option><option>C</option><option>D</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Materia</label>
+                        <select id="inviteSubject" disabled>
+                            <option value="">— Primero selecciona un grado —</option>
+                        </select>
                     </div>
                 </div>
                 <button type="submit" class="btn-admin primary"><i class="fas fa-paper-plane"></i> Crear Invitación</button>
@@ -198,59 +168,31 @@
             <h3 style="color:var(--primary); margin-bottom:14px;" id="assignTitle">Asignar materia</h3>
             <form id="assignForm">
                 <input type="hidden" id="assignTeacherId">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="form-group">
+                        <label>Grado</label>
+                        <select id="assignGrade" required>
+                            <option value="">— Grado —</option>
+                            <option value="1">1°</option>
+                            <option value="2">2°</option>
+                            <option value="3">3°</option>
+                            <option value="4">4°</option>
+                            <option value="5">5°</option>
+                            <option value="6">6°</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Grupo (opcional)</label>
+                        <select id="assignGroup">
+                            <option value="">Todos</option>
+                            <option>A</option><option>B</option><option>C</option><option>D</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>Materia</label>
-                    <select id="assignSubject" required>
-                        <option value="">— Seleccionar —</option>
-                        <option value="matematicas">Matemáticas</option>
-                        <option value="algebra">Álgebra</option>
-                        <option value="calculo">Cálculo</option>
-                        <option value="geometria">Geometría</option>
-                        <option value="estadistica">Estadística</option>
-                        <option value="fisica">Física</option>
-                        <option value="quimica">Química</option>
-                        <option value="biologia">Biología</option>
-                        <option value="ecologia">Ecología</option>
-                        <option value="anatomia">Anatomía</option>
-                        <option value="espanol">Español</option>
-                        <option value="literatura">Literatura</option>
-                        <option value="lectura-redaccion">Lectura y Redacción</option>
-                        <option value="ingles">Inglés</option>
-                        <option value="historia-mexico">Historia de México</option>
-                        <option value="historia-universal">Historia Universal</option>
-                        <option value="filosofia">Filosofía</option>
-                        <option value="etica">Ética y Valores</option>
-                        <option value="logica">Lógica</option>
-                        <option value="derecho">Derecho</option>
-                        <option value="economia">Economía</option>
-                        <option value="sociologia">Sociología</option>
-                        <option value="psicologia">Psicología</option>
-                        <option value="metodologia">Metodología</option>
-                        <option value="informatica">Informática</option>
-                        <option value="educacion-fisica">Educación Física</option>
-                        <option value="artes">Artes</option>
-                        <option value="orientacion">Orientación</option>
-                        <option value="administracion">Administración</option>
-                        <option value="contabilidad">Contabilidad</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Grado</label>
-                    <select id="assignGrade" required>
-                        <option value="">— Grado —</option>
-                        <option value="1">1°</option>
-                        <option value="2">2°</option>
-                        <option value="3">3°</option>
-                        <option value="4">4°</option>
-                        <option value="5">5°</option>
-                        <option value="6">6°</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Grupo (opcional)</label>
-                    <select id="assignGroup">
-                        <option value="">Todos</option>
-                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                    <select id="assignSubject" required disabled>
+                        <option value="">— Primero selecciona un grado —</option>
                     </select>
                 </div>
                 <button type="submit" class="btn-admin primary">Asignar</button>
@@ -292,10 +234,104 @@
             return r.json();
         };
 
-        // Mapa de slugs → nombres legibles
+        // Materias por grado
+        const materiasPorGrado = {
+            '1': [
+                { slug: 'ciencias-sociales', name: 'Ciencias Sociales' },
+                { slug: 'ingles-1', name: 'Inglés 1' },
+                { slug: 'algebra', name: 'Álgebra' },
+                { slug: 'taller-lectura-redaccion-1', name: 'Taller de Lectura y Redacción 1' },
+                { slug: 'tec-informacion-1', name: 'Tec. de la Información 1' },
+                { slug: 'quimica-inorganica', name: 'Química Inorgánica' },
+                { slug: 'orientacion-tutorias-1', name: 'Orientación y Tutorías 1' },
+                { slug: 'logica', name: 'Lógica' },
+                { slug: 'biologia-1', name: 'Biología 1' }
+            ],
+            '2': [
+                { slug: 'taller-lectura-redaccion-2', name: 'Taller de Lectura y Redacción 2' },
+                { slug: 'orientacion-tutorias-2', name: 'Orientación y Tutorías 2' },
+                { slug: 'geometria-trigonometria', name: 'Geometría y Trigonometría' },
+                { slug: 'biologia-2', name: 'Biología 2' },
+                { slug: 'tec-informacion-2', name: 'Tec. de la Información 2' },
+                { slug: 'quimica-organica', name: 'Química Orgánica' },
+                { slug: 'historia-universal', name: 'Historia Universal' },
+                { slug: 'metodologia-investigacion', name: 'Metodología de la Investigación' },
+                { slug: 'ingles-2', name: 'Inglés 2' }
+            ],
+            '3': [
+                { slug: 'literatura', name: 'Literatura' },
+                { slug: 'ecologia', name: 'Ecología' },
+                { slug: 'fisica-1', name: 'Física 1' },
+                { slug: 'etica', name: 'Ética' },
+                { slug: 'orientacion-tutorias-3', name: 'Orientación y Tutorías 3' },
+                { slug: 'geometria-analitica', name: 'Geometría Analítica' },
+                { slug: 'ingles-3', name: 'Inglés 3' },
+                { slug: 'historia-mexico-1', name: 'Historia de México 1' },
+                { slug: 'comunicacion', name: 'Comunicación' }
+            ],
+            '4': [
+                { slug: 'geometria', name: 'Geometría' },
+                { slug: 'fisica-2', name: 'Física 2' },
+                { slug: 'historia-mexico-2', name: 'Historia de México 2' },
+                { slug: 'probabilidad-estadistica', name: 'Probabilidad y Estadística' },
+                { slug: 'estructura-mexico', name: 'Estructura de México' },
+                { slug: 'filosofia', name: 'Filosofía' },
+                { slug: 'ingles-4', name: 'Inglés 4' },
+                { slug: 'cultura-digital', name: 'Cultura Digital' },
+                { slug: 'orientacion-tutorias-4', name: 'Orientación y Tutorías 4' }
+            ],
+            '5': [
+                { slug: 'anatomia-humana', name: 'Anatomía Humana' },
+                { slug: 'calculo-diferencial', name: 'Cálculo Diferencial' },
+                { slug: 'psicologia', name: 'Psicología' },
+                { slug: 'orientacion-tutorias-5', name: 'Orientación y Tutorías 5' },
+                { slug: 'sociologia', name: 'Sociología' },
+                { slug: 'contabilidad', name: 'Contabilidad' },
+                { slug: 'ingles-5', name: 'Inglés 5' },
+                { slug: 'literatura-mexicana', name: 'Literatura Mexicana' }
+            ],
+            '6': [
+                { slug: 'proyectos-interdisc', name: 'Proyectos Interdisc.' },
+                { slug: 'literatura-universal', name: 'Literatura Universal' },
+                { slug: 'ingles-6', name: 'Inglés 6' },
+                { slug: 'calculo-integral', name: 'Cálculo Integral' },
+                { slug: 'administracion', name: 'Administración' },
+                { slug: 'derecho', name: 'Derecho' },
+                { slug: 'orientacion-tutorias-6', name: 'Orientación y Tutorías 6' },
+                { slug: 'fisiologia-humana', name: 'Fisiología Humana' }
+            ]
+        };
+
+        // Mapa global slug → nombre
         const subjectNames = {};
-        document.querySelectorAll('#inviteSubject option').forEach(o => { if (o.value) subjectNames[o.value] = o.textContent; });
+        Object.values(materiasPorGrado).flat().forEach(m => { subjectNames[m.slug] = m.name; });
         const subjectLabel = (slug) => subjectNames[slug] || slug;
+
+        // Poblar select de materia según grado seleccionado
+        const populateSubjects = (gradeSelect, subjectSelect) => {
+            const grade = gradeSelect.value;
+            subjectSelect.innerHTML = '';
+            if (!grade) {
+                subjectSelect.innerHTML = '<option value="">— Primero selecciona un grado —</option>';
+                subjectSelect.disabled = true;
+                return;
+            }
+            const materias = materiasPorGrado[grade] || [];
+            subjectSelect.innerHTML = '<option value="">— Seleccionar materia —</option>';
+            materias.forEach(m => {
+                subjectSelect.innerHTML += `<option value="${m.slug}">${m.name}</option>`;
+            });
+            subjectSelect.disabled = false;
+        };
+
+        // Invite: grado → materia
+        document.getElementById('inviteGrade').addEventListener('change', () => {
+            populateSubjects(document.getElementById('inviteGrade'), document.getElementById('inviteSubject'));
+        });
+        // Assign modal: grado → materia
+        document.getElementById('assignGrade').addEventListener('change', () => {
+            populateSubjects(document.getElementById('assignGrade'), document.getElementById('assignSubject'));
+        });
 
         // Ocultar campos de materia si se selecciona Admin
         const inviteRoleSel = document.getElementById('inviteRole');
