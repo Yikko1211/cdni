@@ -38,7 +38,6 @@ export const ensureSchema = async (DB) => {
 	try { await DB.prepare('ALTER TABLE users ADD COLUMN group_code TEXT').run(); } catch {}
 	try { await DB.prepare('ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT \'student\'').run(); } catch {}
 
-			FOREIGN KEY (teacher_id) REFERENCES users(id),
 	await DB.prepare(`CREATE TABLE IF NOT EXISTS teacher_profiles (
 		user_id INTEGER PRIMARY KEY,
 		bio TEXT,
