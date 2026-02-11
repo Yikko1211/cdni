@@ -161,7 +161,7 @@ const isAuthenticated = () => {
 		};
 
 		toggleBtn.addEventListener('click', () => {
-			const isOpen = header.classList.contains('nav-open');
+			const isOpen = document.body.classList.contains('nav-overlay-open');
 			if (isOpen) closeMenu();
 			else openMenu();
 		});

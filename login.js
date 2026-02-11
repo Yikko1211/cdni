@@ -51,6 +51,22 @@
 				linksHost.appendChild(ul.cloneNode(true));
 				linksHost.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => closeMenu()));
 			}
+
+			// En /login, solo mostrar el switch necesario (login <-> register)
+			if (actionsHost) {
+				const isLoginVisible = Boolean(document.getElementById('loginForm') && !document.getElementById('loginForm').classList.contains('hidden'));
+				const link = document.createElement('a');
+				link.className = 'btn btn-solid';
+				if (isLoginVisible) {
+					link.href = '#register';
+					link.textContent = 'Registrarse';
+				} else {
+					link.href = '#login';
+					link.textContent = 'Iniciar sesión';
+				}
+				link.addEventListener('click', () => closeMenu());
+				actionsHost.appendChild(link);
+			}
 		};
 
 		const closeMenu = () => {
@@ -70,7 +86,7 @@
 		};
 
 		toggleBtn.addEventListener('click', () => {
-			const isOpen = header.classList.contains('nav-open');
+			const isOpen = document.body.classList.contains('nav-overlay-open');
 			if (isOpen) closeMenu();
 			else openMenu();
 		});
@@ -84,8 +100,6 @@
 		});
 		setHeaderHeightVar();
 	};
-
-	initMobileNav();
 
 	// Lógica simple para cambiar entre Login y Registro
 	const loginForm = document.getElementById('loginForm');
@@ -122,10 +136,17 @@ signUpBtn.addEventListener('click', showRegister);
 // Ir a Login
 signInBtn.addEventListener('click', showLogin);
 
-// Soportar link directo a registro
-if (window.location.hash === '#register') {
-	showRegister();
-}
+const setViewFromHash = () => {
+	if (window.location.hash === '#register') showRegister();
+	else showLogin();
+};
+
+// Soportar link directo a registro/login
+window.addEventListener('hashchange', setViewFromHash);
+setViewFromHash();
+
+	// Ahora que showLogin/showRegister existen, inicializa el menú móvil
+	initMobileNav();
 
 const getCookie = (name) => {
 	const part = document.cookie
