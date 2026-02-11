@@ -477,7 +477,18 @@ footer {
 	body.js-nav .mobile-nav-links a {
 		display: block;
 		padding: 12px 10px;
+		color: #f3d58a;
+		font-weight: 600;
 		border-bottom: 1px solid rgba(255,255,255,0.12);
+	}
+
+	body.js-nav .mobile-nav-links a:hover {
+		color: var(--secondary);
+		background: rgba(255,255,255,0.06);
+	}
+
+	body.js-nav .mobile-nav-links a:active {
+		background: rgba(255,255,255,0.10);
 	}
 
 	body.js-nav .mobile-nav-actions {
