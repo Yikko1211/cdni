@@ -6,7 +6,7 @@
     <title>Panel Maestro | Instituto Abraham Lincoln</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/style.css?v=20260211-6">
+    <link rel="stylesheet" href="/style.css?v=20260211-7">
     <style>
         .teacher-page { padding-top: 100px; background: #f4f4f4; min-height: 100vh; }
         .teacher-hero { padding: 30px 6% 10px; }
@@ -99,6 +99,13 @@
                     <select id="taskSubject" required><option value="">Cargando…</option></select>
                 </div>
                 <div class="form-group">
+                    <label>Grupo (opcional)</label>
+                    <select id="taskGroup">
+                        <option value="">Todos los grupos</option>
+                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Título</label>
                     <input type="text" id="taskTitle" placeholder="Ej: Investigación Cap. 3" required>
                 </div>
@@ -107,8 +114,8 @@
                     <textarea id="taskDesc" placeholder="Instrucciones para el alumno…"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Fecha límite (opcional)</label>
-                    <input type="date" id="taskDue">
+                    <label>Fecha y hora límite (opcional)</label>
+                    <input type="datetime-local" id="taskDue">
                 </div>
                 <button type="submit" class="btn-t primary">Crear Tarea</button>
             </form>
@@ -133,7 +140,7 @@
         </div>
     </div>
 
-    <script src="/script.js?v=20260211-6"></script>
+    <script src="/script.js?v=20260211-7"></script>
     <script>
     (() => {
         const email = () => (localStorage.getItem('userEmail') || '').trim().toLowerCase();
@@ -162,6 +169,31 @@
             return r.json();
         };
 
+        // Mapa slug → nombre bonito
+        const subjectNames = {
+            'ciencias-sociales':'Ciencias Sociales','ingles-1':'Inglés 1','algebra':'Álgebra',
+            'taller-lectura-redaccion-1':'Taller de Lectura y Redacción 1','tec-informacion-1':'Tec. de la Información 1',
+            'quimica-inorganica':'Química Inorgánica','orientacion-tutorias-1':'Orientación y Tutorías 1',
+            'logica':'Lógica','biologia-1':'Biología 1',
+            'taller-lectura-redaccion-2':'Taller de Lectura y Redacción 2','orientacion-tutorias-2':'Orientación y Tutorías 2',
+            'geometria-trigonometria':'Geometría y Trigonometría','biologia-2':'Biología 2',
+            'tec-informacion-2':'Tec. de la Información 2','quimica-organica':'Química Orgánica',
+            'historia-universal':'Historia Universal','metodologia-investigacion':'Metodología de la Investigación','ingles-2':'Inglés 2',
+            'literatura':'Literatura','ecologia':'Ecología','fisica-1':'Física 1','etica':'Ética',
+            'orientacion-tutorias-3':'Orientación y Tutorías 3','geometria-analitica':'Geometría Analítica',
+            'ingles-3':'Inglés 3','historia-mexico-1':'Historia de México 1','comunicacion':'Comunicación',
+            'geometria':'Geometría','fisica-2':'Física 2','historia-mexico-2':'Historia de México 2',
+            'probabilidad-estadistica':'Probabilidad y Estadística','estructura-mexico':'Estructura de México',
+            'filosofia':'Filosofía','ingles-4':'Inglés 4','cultura-digital':'Cultura Digital','orientacion-tutorias-4':'Orientación y Tutorías 4',
+            'anatomia-humana':'Anatomía Humana','calculo-diferencial':'Cálculo Diferencial','psicologia':'Psicología',
+            'orientacion-tutorias-5':'Orientación y Tutorías 5','sociologia':'Sociología','contabilidad':'Contabilidad',
+            'ingles-5':'Inglés 5','literatura-mexicana':'Literatura Mexicana',
+            'proyectos-interdisc':'Proyectos Interdisc.','literatura-universal':'Literatura Universal',
+            'ingles-6':'Inglés 6','calculo-integral':'Cálculo Integral','administracion':'Administración',
+            'derecho':'Derecho','orientacion-tutorias-6':'Orientación y Tutorías 6','fisiologia-humana':'Fisiología Humana'
+        };
+        const subjectLabel = (slug) => subjectNames[slug] || slug.replace(/-/g, ' ');
+
         const isAdmin = role() === 'admin';
 
         // Update headings for admin
@@ -187,11 +219,11 @@
             }
             el.innerHTML = mySubjects.map(s => {
                 const teacherLabel = isAdmin && s.teacher_name ? ` (${s.teacher_name})` : '';
-                return `<span class="sub-item" onclick="filterTasks('${s.subject_slug}', ${s.grade})">${s.subject_slug.replace(/-/g, ' ').toUpperCase()} — ${s.grade}° ${s.group_code || ''}${teacherLabel}</span>`;
+                return `<span class="sub-item" onclick="filterTasks('${s.subject_slug}', ${s.grade})">${subjectLabel(s.subject_slug)} — ${s.grade}°${teacherLabel}</span>`;
             }).join('');
             sel.innerHTML = mySubjects.map(s => {
                 const teacherLabel = isAdmin && s.teacher_name ? ` (${s.teacher_name})` : '';
-                return `<option value="${s.subject_slug}|${s.grade}|${s.group_code || ''}">${s.subject_slug.replace(/-/g, ' ').toUpperCase()} — ${s.grade}° ${s.group_code || ''}${teacherLabel}</option>`;
+                return `<option value="${s.subject_slug}|${s.grade}">${subjectLabel(s.subject_slug)} — ${s.grade}°${teacherLabel}</option>`;
             }).join('');
         };
 
@@ -204,7 +236,7 @@
             const data = await api('create_task', 'POST', {
                 subject_slug: val[0],
                 grade: Number(val[1]),
-                group_code: val[2] || null,
+                group_code: document.getElementById('taskGroup').value || null,
                 title: document.getElementById('taskTitle').value.trim(),
                 description: document.getElementById('taskDesc').value.trim(),
                 due_date: document.getElementById('taskDue').value || null
@@ -225,14 +257,16 @@
             const data = await api('my_tasks', 'GET', null, extra);
             const tasks = data.tasks || [];
             if (tasks.length === 0) { el.innerHTML = '<p style="color:#888;">Sin tareas aún.</p>'; return; }
-            let html = `<table class="t-table"><thead><tr>${isAdmin ? '<th>Maestro</th>' : ''}<th>Materia</th><th>Grado</th><th>Título</th><th>Fecha</th><th>Entregas</th><th></th></tr></thead><tbody>`;
+            let html = `<table class="t-table"><thead><tr>${isAdmin ? '<th>Maestro</th>' : ''}<th>Materia</th><th>Grado</th><th>Título</th><th>Límite</th><th>Entregas</th><th></th></tr></thead><tbody>`;
             tasks.forEach(t => {
+                const dueLabel = t.due_date ? new Date(t.due_date).toLocaleString('es-MX', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Sin límite';
+                const isPast = t.due_date && new Date(t.due_date) < new Date();
                 html += `<tr>
                     ${isAdmin ? `<td>${t.teacher_name || '—'}</td>` : ''}
-                    <td>${t.subject_slug.replace(/-/g, ' ').toUpperCase()}</td>
+                    <td>${subjectLabel(t.subject_slug)}</td>
                     <td>${t.grade}° ${t.group_code || ''}</td>
                     <td><strong>${t.title}</strong></td>
-                    <td>${(t.created_at || '').slice(0, 10)}</td>
+                    <td style="${isPast ? 'color:#c00;font-weight:600' : ''}">${dueLabel}</td>
                     <td><button class="btn-t small primary" onclick="viewSubs(${t.id}, '${t.title.replace(/'/g, "\\'")}')">Ver</button></td>
                     <td><button class="btn-t small danger" onclick="delTask(${t.id})">×</button></td>
                 </tr>`;

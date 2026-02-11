@@ -6,7 +6,7 @@
     <title>Panel Admin | Instituto Abraham Lincoln</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/style.css?v=20260211-6">
+    <link rel="stylesheet" href="/style.css?v=20260211-7">
     <style>
         .admin-page { padding-top: 100px; background: #f4f4f4; min-height: 100vh; }
         .admin-hero { padding: 30px 6% 10px; }
@@ -99,52 +99,20 @@
     <section class="admin-section" id="tab-invite">
         <div class="admin-card">
             <h3><i class="fas fa-paper-plane"></i> Crear Invitación</h3>
-            <p style="color:#666; margin-bottom:14px; font-size:0.88rem;">Genera un link de invitación. El maestro lo abre, crea su contraseña y queda activo con su materia pre-asignada.</p>
-            <form id="inviteForm">
-                <div class="form-group">
+            <p style=\"color:#666; margin-bottom:14px; font-size:0.88rem;\">Genera un link de invitación. El maestro lo abre, crea su contraseña y queda activo. Luego puedes asignarle materias desde la pestaña Maestros.</p>
+            <form id=\"inviteForm\">
+                <div class=\"form-group\">
                     <label>Correo del maestro</label>
-                    <input type="email" id="inviteEmail" placeholder="maestro@lincoln.edu.mx" required>
+                    <input type=\"email\" id=\"inviteEmail\" placeholder=\"maestro@lincoln.edu.mx\" required>
                 </div>
-                <div class="form-group">
+                <div class=\"form-group\">
                     <label>Rol</label>
-                    <select id="inviteRole">
-                        <option value="teacher">Maestro</option>
-                        <option value="admin">Admin</option>
+                    <select id=\"inviteRole\">
+                        <option value=\"teacher\">Maestro</option>
+                        <option value=\"admin\">Admin</option>
                     </select>
                 </div>
-                <div id="subjectFields">
-                    <div style="border-top:1px solid #eee; margin:14px 0 10px; padding-top:12px;">
-                        <strong style="color:var(--primary); font-size:0.88rem;"><i class="fas fa-book"></i> Materia a asignar (maestros)</strong>
-                    </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <div class="form-group">
-                            <label>Grado</label>
-                            <select id="inviteGrade">
-                                <option value="">— Grado —</option>
-                                <option value="1">1°</option>
-                                <option value="2">2°</option>
-                                <option value="3">3°</option>
-                                <option value="4">4°</option>
-                                <option value="5">5°</option>
-                                <option value="6">6°</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Grupo</label>
-                            <select id="inviteGroup">
-                                <option value="">Todos</option>
-                                <option>A</option><option>B</option><option>C</option><option>D</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Materia</label>
-                        <select id="inviteSubject" disabled>
-                            <option value="">— Primero selecciona un grado —</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="btn-admin primary"><i class="fas fa-paper-plane"></i> Crear Invitación</button>
+                <button type=\"submit\" class=\"btn-admin primary\"><i class=\"fas fa-paper-plane\"></i> Crear Invitación</button>
             </form>
             <div id="inviteResult"></div>
         </div>
@@ -164,48 +132,20 @@
 
     <!-- ===== MODAL: Asignar materias ===== -->
     <div id="assignModal" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.4); align-items:center; justify-content:center;">
-        <div style="background:#fff; border-radius:16px; max-width:500px; width:90%; padding:30px; margin:auto; position:relative; top:50%; transform:translateY(-50%);">
-            <h3 style="color:var(--primary); margin-bottom:14px;" id="assignTitle">Asignar materia</h3>
-            <form id="assignForm">
-                <input type="hidden" id="assignTeacherId">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <div class="form-group">
-                        <label>Grado</label>
-                        <select id="assignGrade" required>
-                            <option value="">— Grado —</option>
-                            <option value="1">1°</option>
-                            <option value="2">2°</option>
-                            <option value="3">3°</option>
-                            <option value="4">4°</option>
-                            <option value="5">5°</option>
-                            <option value="6">6°</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Grupo (opcional)</label>
-                        <select id="assignGroup">
-                            <option value="">Todos</option>
-                            <option>A</option><option>B</option><option>C</option><option>D</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Materia</label>
-                    <select id="assignSubject" required disabled>
-                        <option value="">— Primero selecciona un grado —</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-admin primary">Asignar</button>
-                <button type="button" class="btn-admin" onclick="document.getElementById('assignModal').style.display='none'">Cancelar</button>
-            </form>
+        <div style="background:#fff; border-radius:16px; max-width:600px; width:94%; padding:30px; margin:auto; position:relative; top:50%; transform:translateY(-50%); max-height:85vh; overflow:auto;">
+            <h3 style="color:var(--primary); margin-bottom:14px;" id="assignTitle">Asignar materias</h3>
+            <input type="hidden" id="assignTeacherId">
+            <p style="color:#666; font-size:0.85rem; margin-bottom:12px;">Selecciona las materias que imparte este maestro:</p>
+            <div id="assignCheckboxes" style="max-height:40vh; overflow:auto; border:1px solid #eee; border-radius:10px; padding:12px;"></div>
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn-admin primary" onclick="saveAssignedSubjects()"><i class="fas fa-save"></i> Guardar</button>
+                <button type="button" class="btn-admin" onclick="document.getElementById('assignModal').style.display='none'">Cerrar</button>
+            </div>
             <div id="assignMsg"></div>
-            <hr style="margin:14px 0;">
-            <h4 style="color:var(--primary);">Materias asignadas:</h4>
-            <div id="assignedList">—</div>
         </div>
     </div>
 
-    <script src="/script.js?v=20260211-6"></script>
+    <script src="/script.js?v=20260211-7"></script>
     <script>
     (() => {
         const email = () => (localStorage.getItem('userEmail') || '').trim().toLowerCase();
@@ -307,39 +247,6 @@
         Object.values(materiasPorGrado).flat().forEach(m => { subjectNames[m.slug] = m.name; });
         const subjectLabel = (slug) => subjectNames[slug] || slug;
 
-        // Poblar select de materia según grado seleccionado
-        const populateSubjects = (gradeSelect, subjectSelect) => {
-            const grade = gradeSelect.value;
-            subjectSelect.innerHTML = '';
-            if (!grade) {
-                subjectSelect.innerHTML = '<option value="">— Primero selecciona un grado —</option>';
-                subjectSelect.disabled = true;
-                return;
-            }
-            const materias = materiasPorGrado[grade] || [];
-            subjectSelect.innerHTML = '<option value="">— Seleccionar materia —</option>';
-            materias.forEach(m => {
-                subjectSelect.innerHTML += `<option value="${m.slug}">${m.name}</option>`;
-            });
-            subjectSelect.disabled = false;
-        };
-
-        // Invite: grado → materia
-        document.getElementById('inviteGrade').addEventListener('change', () => {
-            populateSubjects(document.getElementById('inviteGrade'), document.getElementById('inviteSubject'));
-        });
-        // Assign modal: grado → materia
-        document.getElementById('assignGrade').addEventListener('change', () => {
-            populateSubjects(document.getElementById('assignGrade'), document.getElementById('assignSubject'));
-        });
-
-        // Ocultar campos de materia si se selecciona Admin
-        const inviteRoleSel = document.getElementById('inviteRole');
-        const subjectFields = document.getElementById('subjectFields');
-        inviteRoleSel.addEventListener('change', () => {
-            subjectFields.style.display = inviteRoleSel.value === 'admin' ? 'none' : 'block';
-        });
-
         // --- Maestros ---
         const loadTeachers = async () => {
             const el = document.getElementById('teachersList');
@@ -365,19 +272,12 @@
             resEl.innerHTML = '';
             const invEmail = document.getElementById('inviteEmail').value.trim();
             const invRole = document.getElementById('inviteRole').value;
-            const invSubject = document.getElementById('inviteSubject').value.trim();
-            const invGrade = document.getElementById('inviteGrade').value;
-            const invGroup = document.getElementById('inviteGroup').value;
             const payload = { email: invEmail, role: invRole };
-            if (invSubject) payload.subject_slug = invSubject;
-            if (invGrade) payload.subject_grade = Number(invGrade);
-            if (invGroup) payload.subject_group = invGroup;
             const data = await api('invite', 'POST', payload);
             if (data.link) {
                 const fullLink = window.location.origin + data.link;
-                const subjectLabel2 = invSubject ? ` · Materia: ${subjectLabel(invSubject)} ${invGrade ? invGrade + '°' : ''} ${invGroup || 'Todos'}` : '';
                 resEl.innerHTML = `
-                    <div class="msg ok"><i class="fas fa-check-circle"></i> ${data.message}${subjectLabel2}</div>
+                    <div class="msg ok"><i class="fas fa-check-circle"></i> ${data.message}</div>
                     <div class="invite-link">
                         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                             <span style="flex:1; min-width:0;"><i class="fas fa-link"></i> <a href="${fullLink}" target="_blank">${fullLink}</a></span>
@@ -403,13 +303,12 @@
             const el = document.getElementById('invitationsList');
             const data = await api('invitations');
             if (!data.invitations || data.invitations.length === 0) { el.innerHTML = '<p style="color:#888;">Ninguna invitación.</p>'; return; }
-            let html = `<table class="admin-table"><thead><tr><th>Email</th><th>Rol</th><th>Materia</th><th>Estado</th><th>Link</th><th></th></tr></thead><tbody>`;
+            let html = `<table class="admin-table"><thead><tr><th>Email</th><th>Rol</th><th>Estado</th><th>Link</th><th></th></tr></thead><tbody>`;
             data.invitations.forEach(i => {
                 const status = i.used_at ? '<span style="color:green">✓ Usada</span>' : (new Date(i.expires_at) < new Date() ? '<span style="color:red">Expirada</span>' : '<span style="color:#c5a059">Pendiente</span>');
-                const subject = i.subject_slug ? `${subjectLabel(i.subject_slug)} ${i.subject_grade || ''}° ${i.subject_group || 'Todos'}` : '—';
                 const link = window.location.origin + '/login/#invite=' + i.token;
                 const linkBtn = !i.used_at ? `<button class="btn-admin small primary" onclick="copyLink('${link}')" title="Copiar link"><i class="fas fa-copy"></i></button>` : '';
-                html += `<tr><td>${i.email}</td><td>${i.role}</td><td>${subject}</td><td>${status}</td><td>${linkBtn}</td><td>${!i.used_at ? `<button class="btn-admin small danger" onclick="delInvite(${i.id})">×</button>` : ''}</td></tr>`;
+                html += `<tr><td>${i.email}</td><td>${i.role}</td><td>${status}</td><td>${linkBtn}</td><td>${!i.used_at ? `<button class="btn-admin small danger" onclick="delInvite(${i.id})">×</button>` : ''}</td></tr>`;
             });
             html += '</tbody></table>';
             el.innerHTML = html;
@@ -458,34 +357,52 @@
             }
         };
 
-        // --- Asignar materia ---
+        // --- Asignar materias (checkboxes) ---
         window.openAssign = async (teacherId, name) => {
             document.getElementById('assignTeacherId').value = teacherId;
-            document.getElementById('assignTitle').textContent = `Asignar materia a ${name}`;
+            document.getElementById('assignTitle').textContent = `Asignar materias a ${name}`;
+            document.getElementById('assignMsg').innerHTML = '';
             document.getElementById('assignModal').style.display = 'block';
+
+            // Obtener materias ya asignadas
             const data = await fetch(`/api/admin?action=teacher_subjects&teacher_id=${teacherId}&admin_email=${encodeURIComponent(email())}`).then(r => r.json());
-            const list = document.getElementById('assignedList');
-            if (!data.subjects || data.subjects.length === 0) { list.innerHTML = '<p style="color:#888;">Ninguna aún.</p>'; return; }
-            list.innerHTML = data.subjects.map(s => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>${subjectLabel(s.subject_slug)} — ${s.grade}° ${s.group_code || 'Todos'}</span> <button class="btn-admin small danger" onclick="delSubject(${s.id}, ${teacherId}, '${name}')">×</button></div>`).join('');
+            const assigned = new Set((data.subjects || []).map(s => `${s.subject_slug}|${s.grade}`));
+
+            // Generar checkboxes agrupados por grado
+            const container = document.getElementById('assignCheckboxes');
+            let html = '';
+            for (const [grado, materias] of Object.entries(materiasPorGrado)) {
+                html += `<div style="margin-bottom:12px;">`;
+                html += `<div style="font-weight:700; color:var(--primary); margin-bottom:6px; font-size:0.9rem; border-bottom:1px solid #eee; padding-bottom:4px;">${grado}° Grado</div>`;
+                html += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:2px 12px;">`;
+                materias.forEach(m => {
+                    const key = `${m.slug}|${grado}`;
+                    const checked = assigned.has(key) ? 'checked' : '';
+                    html += `<label style="display:flex; align-items:center; gap:6px; font-size:0.84rem; padding:3px 0; cursor:pointer;">
+                        <input type="checkbox" value="${key}" ${checked} style="accent-color:var(--primary);">
+                        ${m.name}
+                    </label>`;
+                });
+                html += `</div></div>`;
+            }
+            container.innerHTML = html;
         };
 
-        document.getElementById('assignForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const teacherId = document.getElementById('assignTeacherId').value;
-            const data = await api('assign_subject', 'POST', {
-                teacher_id: Number(teacherId),
-                subject_slug: document.getElementById('assignSubject').value.trim(),
-                grade: Number(document.getElementById('assignGrade').value),
-                group_code: document.getElementById('assignGroup').value || null
-            });
-            document.getElementById('assignMsg').innerHTML = `<div class="msg ${data.message.includes('asignada') ? 'ok' : 'err'}">${data.message}</div>`;
-            const name = document.getElementById('assignTitle').textContent.replace('Asignar materia a ', '');
-            openAssign(Number(teacherId), name);
-        });
+        window.saveAssignedSubjects = async () => {
+            const teacherId = Number(document.getElementById('assignTeacherId').value);
+            const checkboxes = document.getElementById('assignCheckboxes').querySelectorAll('input[type=checkbox]');
+            const selected = [];
+            checkboxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
 
-        window.delSubject = async (id, teacherId, name) => {
-            await fetch(`/api/admin?action=remove_subject&id=${id}&admin_email=${encodeURIComponent(email())}`, { method: 'DELETE' });
-            openAssign(teacherId, name);
+            const data = await api('assign_subjects_bulk', 'POST', {
+                teacher_id: teacherId,
+                subjects: selected.map(s => {
+                    const [slug, grade] = s.split('|');
+                    return { subject_slug: slug, grade: Number(grade) };
+                })
+            });
+            document.getElementById('assignMsg').innerHTML = `<div class="msg ${data.message ? 'ok' : 'err'}">${data.message || 'Error'}</div>`;
+            loadTeachers();
         };
 
         // Init

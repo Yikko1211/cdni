@@ -26,7 +26,7 @@ export async function onRequest({ request, env }) {
 				).all();
 			} else {
 				rows = await env.DB.prepare(
-					`SELECT id, subject_slug, grade, group_code FROM teacher_subjects WHERE teacher_id = ? ORDER BY grade, subject_slug`
+					`SELECT id, subject_slug, grade FROM teacher_subjects WHERE teacher_id = ? ORDER BY grade, subject_slug`
 				).bind(teacher.id).all();
 			}
 			return jsonResponse(200, { subjects: rows?.results || [] });
@@ -96,8 +96,8 @@ export async function onRequest({ request, env }) {
 			// Verificar que el maestro tiene asignada esa materia (o es admin)
 			if (teacher.role !== 'admin') {
 				const assigned = await env.DB.prepare(
-					`SELECT id FROM teacher_subjects WHERE teacher_id = ? AND subject_slug = ? AND grade = ? AND (group_code IS NULL OR group_code = ?)`
-				).bind(teacher.id, subjectSlug, grade, groupCode).first();
+					`SELECT id FROM teacher_subjects WHERE teacher_id = ? AND subject_slug = ? AND grade = ?`
+				).bind(teacher.id, subjectSlug, grade).first();
 				if (!assigned) return jsonResponse(403, { message: 'No tienes asignada esta materia/grado.' });
 			}
 

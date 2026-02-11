@@ -99,6 +99,24 @@ export async function onRequest({ request, env }) {
 			return jsonResponse(201, { message: 'Materia asignada.' });
 		}
 
+		if (action === 'assign_subjects_bulk') {
+			const teacherId = Number(body.teacher_id);
+			const subjects = body.subjects || [];
+			if (!teacherId) return jsonResponse(400, { message: 'teacher_id requerido.' });
+			// Borrar todas las asignaciones actuales y re-insertar las seleccionadas
+			await env.DB.prepare('DELETE FROM teacher_subjects WHERE teacher_id = ?').bind(teacherId).run();
+			for (const s of subjects) {
+				const slug = (s.subject_slug || '').trim().toLowerCase();
+				const grade = Number(s.grade);
+				if (slug && grade) {
+					await env.DB.prepare(
+						`INSERT OR IGNORE INTO teacher_subjects (teacher_id, subject_slug, grade, group_code) VALUES (?, ?, ?, NULL)`
+					).bind(teacherId, slug, grade).run();
+				}
+			}
+			return jsonResponse(200, { message: `${subjects.length} materia(s) asignadas.` });
+		}
+
 		if (action === 'set_role') {
 			const userId = Number(body.user_id);
 			const newRole = body.role;
@@ -106,8 +124,8 @@ export async function onRequest({ request, env }) {
 			if (!['admin', 'teacher', 'student'].includes(newRole)) return jsonResponse(400, { message: 'Role inválido.' });
 			if (userId === admin.id) return jsonResponse(400, { message: 'No puedes cambiar tu propio role.' });
 			await env.DB.prepare('UPDATE users SET role = ? WHERE id = ?').bind(newRole, userId).run();
-			// Si es admin, quitar grado y grupo
-			if (newRole === 'admin') {
+			// Si es admin o teacher, quitar grado y grupo (no tienen grado)
+			if (newRole === 'admin' || newRole === 'teacher') {
 				await env.DB.prepare('UPDATE users SET grade = NULL, group_code = NULL WHERE id = ?').bind(userId).run();
 			}
 			// Create teacher_profile if promoting to teacher

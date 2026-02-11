@@ -564,6 +564,23 @@ const isAuthenticated = () => {
 					item.appendChild(p);
 				}
 
+				// Fecha límite
+				const isPastDeadline = t.due_date && new Date(t.due_date) < new Date();
+				if (t.due_date) {
+					const dueLine = document.createElement('div');
+					dueLine.style.cssText = 'font-size:0.84rem; margin-top:6px; font-weight:600;';
+					const dueDate = new Date(t.due_date);
+					const dueStr = dueDate.toLocaleString('es-MX', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+					if (isPastDeadline) {
+						dueLine.style.color = '#c00';
+						dueLine.textContent = `⏰ Fecha límite vencida: ${dueStr}`;
+					} else {
+						dueLine.style.color = '#7a5a13';
+						dueLine.textContent = `⏰ Fecha límite: ${dueStr}`;
+					}
+					item.appendChild(dueLine);
+				}
+
 				const meta = document.createElement('div');
 				meta.className = 'task-meta';
 				if (t.submitted_at) {
@@ -572,6 +589,8 @@ const isAuthenticated = () => {
 					when.className = 'badge warn';
 					when.textContent = `Enviado: ${formatDateTime(t.submitted_at)}`;
 					meta.appendChild(when);
+				} else if (isPastDeadline) {
+					meta.appendChild(createBadge('Cerrada', 'warn'));
 				} else {
 					meta.appendChild(createBadge('Pendiente', 'warn'));
 				}
@@ -588,7 +607,7 @@ const isAuthenticated = () => {
 					item.appendChild(link);
 				}
 
-				if (!t.submitted_at) {
+				if (!t.submitted_at && !isPastDeadline) {
 					const form = document.createElement('form');
 					form.className = 'deliver';
 

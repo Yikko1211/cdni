@@ -78,9 +78,17 @@ export async function onRequest(context) {
 	`);
 
 	// Validar que la tarea exista
-	const task = await env.DB.prepare(`SELECT id FROM tasks WHERE id = ?`).bind(taskId).first();
+	const task = await env.DB.prepare(`SELECT id, due_date FROM tasks WHERE id = ?`).bind(taskId).first();
 	if (!task?.id) {
 		return json({ message: 'La tarea no existe.' }, 404);
+	}
+
+	// Verificar fecha límite
+	if (task.due_date) {
+		const deadline = new Date(task.due_date);
+		if (!isNaN(deadline.getTime()) && new Date() > deadline) {
+			return json({ message: 'La fecha y hora límite ya pasó. No se pueden enviar entregas.' }, 403);
+		}
 	}
 
 	// Upsert: si ya entregó, actualiza; si no, inserta
