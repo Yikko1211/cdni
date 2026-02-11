@@ -6,7 +6,7 @@
     <title>Panel Maestro | Instituto Abraham Lincoln</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/style.css?v=20260211-5">
+    <link rel="stylesheet" href="/style.css?v=20260211-6">
     <style>
         .teacher-page { padding-top: 100px; background: #f4f4f4; min-height: 100vh; }
         .teacher-hero { padding: 30px 6% 10px; }
@@ -83,8 +83,8 @@
     <!-- ===== MIS MATERIAS ===== -->
     <section class="teacher-section active" id="tab-subjects">
         <div class="t-card">
-            <h3>Materias asignadas</h3>
-            <p style="color:#666; font-size:0.85rem; margin-bottom:12px;">Estas son las materias que te asignó el administrador. Haz clic en una para ver tareas.</p>
+            <h3 id="subjectsTitle">Materias asignadas</h3>
+            <p style="color:#666; font-size:0.85rem; margin-bottom:12px;" id="subjectsDesc">Estas son las materias que te asignó el administrador. Haz clic en una para ver tareas.</p>
             <div id="mySubjectsList">Cargando…</div>
         </div>
     </section>
@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    <script src="/script.js?v=20260211-5"></script>
+    <script src="/script.js?v=20260211-6"></script>
     <script>
     (() => {
         const email = () => (localStorage.getItem('userEmail') || '').trim().toLowerCase();
@@ -162,6 +162,17 @@
             return r.json();
         };
 
+        const isAdmin = role() === 'admin';
+
+        // Update headings for admin
+        if (isAdmin) {
+            document.getElementById('subjectsTitle').textContent = 'Todas las materias';
+            document.getElementById('subjectsDesc').textContent = 'Todas las materias asignadas a todos los maestros. Haz clic en una para ver tareas.';
+            document.querySelector('.teacher-hero h1').innerHTML = '<i class="fas fa-chalkboard-teacher"></i> Supervisión de Maestros';
+            document.querySelector('[data-tab="subjects"]').innerHTML = '<i class="fas fa-book"></i> Materias';
+            document.querySelector('[data-tab="tasks"]').innerHTML = '<i class="fas fa-tasks"></i> Todas las Tareas';
+        }
+
         let mySubjects = [];
 
         const loadSubjects = async () => {
@@ -170,12 +181,18 @@
             const data = await api('my_subjects');
             mySubjects = data.subjects || [];
             if (mySubjects.length === 0) {
-                el.innerHTML = '<p style="color:#888;">No tienes materias asignadas. Pide al admin que te asigne.</p>';
+                el.innerHTML = '<p style="color:#888;">No hay materias asignadas.</p>';
                 sel.innerHTML = '<option value="">— Sin materias —</option>';
                 return;
             }
-            el.innerHTML = mySubjects.map(s => `<span class="sub-item" onclick="filterTasks('${s.subject_slug}', ${s.grade})">${s.subject_slug.replace(/-/g, ' ').toUpperCase()} — ${s.grade}° ${s.group_code || ''}</span>`).join('');
-            sel.innerHTML = mySubjects.map(s => `<option value="${s.subject_slug}|${s.grade}|${s.group_code || ''}">${s.subject_slug.replace(/-/g, ' ').toUpperCase()} — ${s.grade}° ${s.group_code || ''}</option>`).join('');
+            el.innerHTML = mySubjects.map(s => {
+                const teacherLabel = isAdmin && s.teacher_name ? ` (${s.teacher_name})` : '';
+                return `<span class="sub-item" onclick="filterTasks('${s.subject_slug}', ${s.grade})">${s.subject_slug.replace(/-/g, ' ').toUpperCase()} — ${s.grade}° ${s.group_code || ''}${teacherLabel}</span>`;
+            }).join('');
+            sel.innerHTML = mySubjects.map(s => {
+                const teacherLabel = isAdmin && s.teacher_name ? ` (${s.teacher_name})` : '';
+                return `<option value="${s.subject_slug}|${s.grade}|${s.group_code || ''}">${s.subject_slug.replace(/-/g, ' ').toUpperCase()} — ${s.grade}° ${s.group_code || ''}${teacherLabel}</option>`;
+            }).join('');
         };
 
         // Crear tarea
@@ -208,9 +225,10 @@
             const data = await api('my_tasks', 'GET', null, extra);
             const tasks = data.tasks || [];
             if (tasks.length === 0) { el.innerHTML = '<p style="color:#888;">Sin tareas aún.</p>'; return; }
-            let html = `<table class="t-table"><thead><tr><th>Materia</th><th>Grado</th><th>Título</th><th>Fecha</th><th>Entregas</th><th></th></tr></thead><tbody>`;
+            let html = `<table class="t-table"><thead><tr>${isAdmin ? '<th>Maestro</th>' : ''}<th>Materia</th><th>Grado</th><th>Título</th><th>Fecha</th><th>Entregas</th><th></th></tr></thead><tbody>`;
             tasks.forEach(t => {
                 html += `<tr>
+                    ${isAdmin ? `<td>${t.teacher_name || '—'}</td>` : ''}
                     <td>${t.subject_slug.replace(/-/g, ' ').toUpperCase()}</td>
                     <td>${t.grade}° ${t.group_code || ''}</td>
                     <td><strong>${t.title}</strong></td>

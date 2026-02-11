@@ -15,9 +15,20 @@ export async function onRequest({ request, env }) {
 	if (request.method === 'GET') {
 		// Mis materias asignadas
 		if (action === 'my_subjects') {
-			const rows = await env.DB.prepare(
-				`SELECT id, subject_slug, grade, group_code FROM teacher_subjects WHERE teacher_id = ? ORDER BY grade, subject_slug`
-			).bind(teacher.id).all();
+			let rows;
+			if (teacher.role === 'admin') {
+				// Admin ve todas las materias de todos los maestros
+				rows = await env.DB.prepare(
+					`SELECT ts.id, ts.subject_slug, ts.grade, ts.group_code, ts.teacher_id, u.name AS teacher_name
+					 FROM teacher_subjects ts
+					 LEFT JOIN users u ON u.id = ts.teacher_id
+					 ORDER BY ts.grade, ts.subject_slug`
+				).all();
+			} else {
+				rows = await env.DB.prepare(
+					`SELECT id, subject_slug, grade, group_code FROM teacher_subjects WHERE teacher_id = ? ORDER BY grade, subject_slug`
+				).bind(teacher.id).all();
+			}
 			return jsonResponse(200, { subjects: rows?.results || [] });
 		}
 
@@ -25,10 +36,18 @@ export async function onRequest({ request, env }) {
 		if (action === 'my_tasks') {
 			const subjectSlug = url.searchParams.get('subject') || '';
 			const grade = Number(url.searchParams.get('grade') || 0);
-			let q = `SELECT id, subject_slug, grade, group_code, title, description, due_date, created_at FROM tasks WHERE teacher_id = ?`;
-			const binds = [teacher.id];
-			if (subjectSlug) { q += ' AND subject_slug = ?'; binds.push(subjectSlug); }
-			if (grade) { q += ' AND grade = ?'; binds.push(grade); }
+			let q, binds;
+			if (teacher.role === 'admin') {
+				// Admin ve todas las tareas de todos los maestros
+				q = `SELECT t.id, t.subject_slug, t.grade, t.group_code, t.title, t.description, t.due_date, t.created_at, t.teacher_id, u.name AS teacher_name
+				     FROM tasks t LEFT JOIN users u ON u.id = t.teacher_id WHERE 1=1`;
+				binds = [];
+			} else {
+				q = `SELECT id, subject_slug, grade, group_code, title, description, due_date, created_at FROM tasks WHERE teacher_id = ?`;
+				binds = [teacher.id];
+			}
+			if (subjectSlug) { q += ' AND ' + (teacher.role === 'admin' ? 't.' : '') + 'subject_slug = ?'; binds.push(subjectSlug); }
+			if (grade) { q += ' AND ' + (teacher.role === 'admin' ? 't.' : '') + 'grade = ?'; binds.push(grade); }
 			q += ' ORDER BY created_at DESC';
 			const rows = await env.DB.prepare(q).bind(...binds).all();
 			return jsonResponse(200, { tasks: rows?.results || [] });
@@ -38,9 +57,11 @@ export async function onRequest({ request, env }) {
 		if (action === 'submissions') {
 			const taskId = Number(url.searchParams.get('task_id') || 0);
 			if (!taskId) return jsonResponse(400, { message: 'task_id requerido.' });
-			// Verificar que la tarea le pertenece
-			const task = await env.DB.prepare('SELECT id FROM tasks WHERE id = ? AND teacher_id = ?').bind(taskId, teacher.id).first();
-			if (!task && teacher.role !== 'admin') return jsonResponse(403, { message: 'Esta tarea no te pertenece.' });
+			// Verificar que la tarea le pertenece (admin puede ver todas)
+			if (teacher.role !== 'admin') {
+				const task = await env.DB.prepare('SELECT id FROM tasks WHERE id = ? AND teacher_id = ?').bind(taskId, teacher.id).first();
+				if (!task) return jsonResponse(403, { message: 'Esta tarea no te pertenece.' });
+			}
 			const rows = await env.DB.prepare(
 				`SELECT s.id, s.user_email, s.answer_text, s.file_url, s.created_at,
 				        u.name AS student_name, u.grade AS student_grade, u.group_code AS student_group
