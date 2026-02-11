@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin | Instituto Abraham Lincoln</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css?v=20260211-1">
+    <style>
+        .admin-page { padding-top: 100px; background: #f4f4f4; min-height: 100vh; }
+        .admin-hero { padding: 30px 6% 10px; }
+        .admin-hero h1 { color: var(--primary); margin-bottom: 6px; }
+        .admin-hero p { color: #666; }
+
+        .admin-tabs { display: flex; gap: 0; padding: 0 6%; border-bottom: 2px solid #ddd; margin-bottom: 20px; flex-wrap: wrap; }
+        .admin-tab { padding: 12px 20px; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .admin-tab:hover { color: var(--primary); }
+        .admin-tab.active { color: var(--primary); border-bottom-color: var(--secondary); }
+
+        .admin-section { display: none; padding: 0 6% 40px; }
+        .admin-section.active { display: block; }
+
+        .admin-card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+        .admin-card h3 { color: var(--primary); margin-bottom: 12px; }
+
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .admin-table th { text-align: left; padding: 10px 8px; border-bottom: 2px solid #ddd; color: var(--primary); font-size: 0.82rem; text-transform: uppercase; }
+        .admin-table td { padding: 10px 8px; border-bottom: 1px solid #eee; }
+        .admin-table tr:hover { background: #fafafa; }
+
+        .badge-role { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-role.admin { background: #ffe0e0; color: #c00; }
+        .badge-role.teacher { background: #e0f0ff; color: #036; }
+        .badge-role.student { background: #e8f5e9; color: #2e7d32; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; color: var(--primary); font-size: 0.88rem; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; font-family: inherit; }
+        .form-group select { cursor: pointer; }
+
+        .btn-admin { padding: 10px 22px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.88rem; transition: 0.2s; }
+        .btn-admin.primary { background: var(--primary); color: #fff; }
+        .btn-admin.primary:hover { background: #132d5e; }
+        .btn-admin.danger { background: #c00; color: #fff; }
+        .btn-admin.danger:hover { background: #a00; }
+        .btn-admin.small { padding: 5px 12px; font-size: 0.78rem; }
+
+        .invite-link { background: #f0f6ff; padding: 12px; border-radius: 8px; word-break: break-all; margin-top: 10px; font-size: 0.85rem; }
+        .invite-link a { color: var(--primary); text-decoration: underline; }
+
+        .msg { padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.88rem; }
+        .msg.ok { background: #e8f5e9; color: #2e7d32; }
+        .msg.err { background: #fce4ec; color: #c62828; }
+
+        @media (max-width: 768px) {
+            .admin-table { font-size: 0.78rem; }
+            .admin-table th, .admin-table td { padding: 8px 4px; }
+            .admin-tabs { gap: 0; }
+            .admin-tab { padding: 10px 12px; font-size: 0.82rem; }
+        }
+    </style>
+</head>
+<body class="admin-page is-auth">
+    <header>
+        <div class="logo">
+            <img src="/imagenes/circuloabraham.png" alt="Logo">
+            INSTITUTO ABRAHAM LINCOLN
+        </div>
+        <nav><ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/aula/">Aula</a></li>
+        </ul></nav>
+        <div class="nav-actions">
+            <a class="btn btn-outline btn-logout" href="#">Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <section class="admin-hero">
+        <h1><i class="fas fa-shield-alt"></i> Panel de Administración</h1>
+        <p id="adminWelcome">Cargando…</p>
+    </section>
+
+    <div class="admin-tabs">
+        <div class="admin-tab active" data-tab="teachers"><i class="fas fa-chalkboard-teacher"></i> Maestros</div>
+        <div class="admin-tab" data-tab="invite"><i class="fas fa-envelope"></i> Invitar</div>
+        <div class="admin-tab" data-tab="users"><i class="fas fa-users"></i> Usuarios</div>
+    </div>
+
+    <!-- ===== TAB: MAESTROS ===== -->
+    <section class="admin-section active" id="tab-teachers">
+        <div class="admin-card">
+            <h3><i class="fas fa-chalkboard-teacher"></i> Maestros registrados</h3>
+            <div id="teachersList">Cargando…</div>
+        </div>
+    </section>
+
+    <!-- ===== TAB: INVITAR ===== -->
+    <section class="admin-section" id="tab-invite">
+        <div class="admin-card">
+            <h3><i class="fas fa-paper-plane"></i> Crear Invitación</h3>
+            <p style="color:#666; margin-bottom:14px; font-size:0.88rem;">Genera un link de invitación. El maestro lo abre, crea su contraseña y queda activo.</p>
+            <form id="inviteForm">
+                <div class="form-group">
+                    <label>Correo del maestro</label>
+                    <input type="email" id="inviteEmail" placeholder="maestro@lincoln.edu.mx" required>
+                </div>
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select id="inviteRole">
+                        <option value="teacher">Maestro</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-admin primary">Crear Invitación</button>
+            </form>
+            <div id="inviteResult"></div>
+        </div>
+        <div class="admin-card">
+            <h3>Invitaciones enviadas</h3>
+            <div id="invitationsList">Cargando…</div>
+        </div>
+    </section>
+
+    <!-- ===== TAB: USUARIOS ===== -->
+    <section class="admin-section" id="tab-users">
+        <div class="admin-card">
+            <h3><i class="fas fa-users"></i> Todos los usuarios</h3>
+            <div id="allUsersList">Cargando…</div>
+        </div>
+    </section>
+
+    <!-- ===== MODAL: Asignar materias ===== -->
+    <div id="assignModal" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.4); align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:16px; max-width:500px; width:90%; padding:30px; margin:auto; position:relative; top:50%; transform:translateY(-50%);">
+            <h3 style="color:var(--primary); margin-bottom:14px;" id="assignTitle">Asignar materia</h3>
+            <form id="assignForm">
+                <input type="hidden" id="assignTeacherId">
+                <div class="form-group">
+                    <label>Materia (slug)</label>
+                    <input type="text" id="assignSubject" placeholder="ej. algebra, ingles-1" required>
+                </div>
+                <div class="form-group">
+                    <label>Grado (1-6)</label>
+                    <input type="number" id="assignGrade" min="1" max="6" required>
+                </div>
+                <div class="form-group">
+                    <label>Grupo (opcional)</label>
+                    <select id="assignGroup">
+                        <option value="">Todos</option>
+                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-admin primary">Asignar</button>
+                <button type="button" class="btn-admin" onclick="document.getElementById('assignModal').style.display='none'">Cancelar</button>
+            </form>
+            <div id="assignMsg"></div>
+            <hr style="margin:14px 0;">
+            <h4 style="color:var(--primary);">Materias asignadas:</h4>
+            <div id="assignedList">—</div>
+        </div>
+    </div>
+
+    <script src="/script.js?v=20260211-1"></script>
+    <script>
+    (() => {
+        const email = () => (localStorage.getItem('userEmail') || '').trim().toLowerCase();
+        const role = () => (localStorage.getItem('userRole') || '').trim();
+
+        if (role() !== 'admin') {
+            document.getElementById('adminWelcome').textContent = 'Acceso denegado. Solo administradores.';
+            return;
+        }
+        document.getElementById('adminWelcome').textContent = `Sesión: ${localStorage.getItem('userName') || email()}`;
+
+        // Tabs
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        const api = async (action, method = 'GET', body = null) => {
+            const opts = { method, headers: { 'Content-Type': 'application/json', 'x-user-email': email() } };
+            if (body) opts.body = JSON.stringify(body);
+            const r = await fetch(`/api/admin?action=${action}&admin_email=${encodeURIComponent(email())}`, opts);
+            return r.json();
+        };
+
+        // --- Maestros ---
+        const loadTeachers = async () => {
+            const el = document.getElementById('teachersList');
+            const data = await api('teachers');
+            if (!data.teachers || data.teachers.length === 0) { el.innerHTML = '<p style="color:#888;">No hay maestros registrados aún.</p>'; return; }
+            let html = `<table class="admin-table"><thead><tr><th>Nombre</th><th>Email</th><th>Registro</th><th>Materias</th></tr></thead><tbody>`;
+            data.teachers.forEach(t => {
+                html += `<tr>
+                    <td><strong>${t.name}</strong></td>
+                    <td>${t.email}</td>
+                    <td>${(t.created_at || '').slice(0, 10)}</td>
+                    <td><button class="btn-admin small primary" onclick="openAssign(${t.id}, '${t.name}')">Asignar</button></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            el.innerHTML = html;
+        };
+
+        // --- Invitar ---
+        document.getElementById('inviteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resEl = document.getElementById('inviteResult');
+            resEl.innerHTML = '';
+            const invEmail = document.getElementById('inviteEmail').value.trim();
+            const invRole = document.getElementById('inviteRole').value;
+            const data = await api('invite', 'POST', { email: invEmail, role: invRole });
+            if (data.link) {
+                const fullLink = window.location.origin + data.link;
+                resEl.innerHTML = `<div class="msg ok">${data.message}</div><div class="invite-link">Link: <a href="${fullLink}" target="_blank">${fullLink}</a><br><small>Válido 48 horas. Envíalo al maestro.</small></div>`;
+                loadInvitations();
+            } else {
+                resEl.innerHTML = `<div class="msg err">${data.message || 'Error'}</div>`;
+            }
+        });
+
+        const loadInvitations = async () => {
+            const el = document.getElementById('invitationsList');
+            const data = await api('invitations');
+            if (!data.invitations || data.invitations.length === 0) { el.innerHTML = '<p style="color:#888;">Ninguna invitación.</p>'; return; }
+            let html = `<table class="admin-table"><thead><tr><th>Email</th><th>Rol</th><th>Expira</th><th>Estado</th><th></th></tr></thead><tbody>`;
+            data.invitations.forEach(i => {
+                const status = i.used_at ? '<span style="color:green">✓ Usada</span>' : (new Date(i.expires_at) < new Date() ? '<span style="color:red">Expirada</span>' : 'Pendiente');
+                html += `<tr><td>${i.email}</td><td>${i.role}</td><td>${(i.expires_at || '').slice(0, 16).replace('T', ' ')}</td><td>${status}</td><td>${!i.used_at ? `<button class="btn-admin small danger" onclick="delInvite(${i.id})">×</button>` : ''}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            el.innerHTML = html;
+        };
+
+        window.delInvite = async (id) => {
+            await fetch(`/api/admin?action=delete_invitation&id=${id}&admin_email=${encodeURIComponent(email())}`, { method: 'DELETE' });
+            loadInvitations();
+        };
+
+        // --- Usuarios ---
+        const loadUsers = async () => {
+            const el = document.getElementById('allUsersList');
+            const data = await api('all_users');
+            if (!data.users || data.users.length === 0) { el.innerHTML = '<p style="color:#888;">Sin usuarios.</p>'; return; }
+            let html = `<table class="admin-table"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Grado</th><th>Cambiar</th></tr></thead><tbody>`;
+            data.users.forEach(u => {
+                html += `<tr>
+                    <td>${u.name}</td><td>${u.email}</td>
+                    <td><span class="badge-role ${u.role}">${u.role}</span></td>
+                    <td>${u.grade ? u.grade + '° ' + (u.group_code || '') : '—'}</td>
+                    <td>
+                        <select onchange="changeRole(${u.id}, this.value)" style="font-size:0.8rem;padding:4px;">
+                            <option value="">—</option>
+                            <option value="student" ${u.role==='student'?'selected':''}>student</option>
+                            <option value="teacher" ${u.role==='teacher'?'selected':''}>teacher</option>
+                            <option value="admin" ${u.role==='admin'?'selected':''}>admin</option>
+                        </select>
+                    </td></tr>`;
+            });
+            html += '</tbody></table>';
+            el.innerHTML = html;
+        };
+
+        window.changeRole = async (userId, newRole) => {
+            if (!newRole) return;
+            if (!confirm(`¿Cambiar rol a "${newRole}"?`)) return;
+            const data = await api('set_role', 'POST', { user_id: userId, role: newRole });
+            alert(data.message || 'Hecho');
+            loadUsers();
+            loadTeachers();
+        };
+
+        // --- Asignar materia ---
+        window.openAssign = async (teacherId, name) => {
+            document.getElementById('assignTeacherId').value = teacherId;
+            document.getElementById('assignTitle').textContent = `Asignar materia a ${name}`;
+            document.getElementById('assignModal').style.display = 'block';
+            const data = await fetch(`/api/admin?action=teacher_subjects&teacher_id=${teacherId}&admin_email=${encodeURIComponent(email())}`).then(r => r.json());
+            const list = document.getElementById('assignedList');
+            if (!data.subjects || data.subjects.length === 0) { list.innerHTML = '<p style="color:#888;">Ninguna aún.</p>'; return; }
+            list.innerHTML = data.subjects.map(s => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span>${s.subject_slug} — ${s.grade}° ${s.group_code || 'Todos'}</span> <button class="btn-admin small danger" onclick="delSubject(${s.id}, ${teacherId}, '${name}')">×</button></div>`).join('');
+        };
+
+        document.getElementById('assignForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const teacherId = document.getElementById('assignTeacherId').value;
+            const data = await api('assign_subject', 'POST', {
+                teacher_id: Number(teacherId),
+                subject_slug: document.getElementById('assignSubject').value.trim(),
+                grade: Number(document.getElementById('assignGrade').value),
+                group_code: document.getElementById('assignGroup').value || null
+            });
+            document.getElementById('assignMsg').innerHTML = `<div class="msg ${data.message.includes('asignada') ? 'ok' : 'err'}">${data.message}</div>`;
+            const name = document.getElementById('assignTitle').textContent.replace('Asignar materia a ', '');
+            openAssign(Number(teacherId), name);
+        });
+
+        window.delSubject = async (id, teacherId, name) => {
+            await fetch(`/api/admin?action=remove_subject&id=${id}&admin_email=${encodeURIComponent(email())}`, { method: 'DELETE' });
+            openAssign(teacherId, name);
+        };
+
+        // Init
+        loadTeachers();
+        loadInvitations();
+        loadUsers();
+    })();
+    </script>
+</body>
+</html>

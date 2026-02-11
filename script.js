@@ -227,6 +227,7 @@ const isAuthenticated = () => {
 			localStorage.removeItem('userEmail');
 			localStorage.removeItem('userGrade');
 			localStorage.removeItem('userGroup');
+			localStorage.removeItem('userRole');
 		} catch {
 			// ignore
 		}
@@ -680,12 +681,31 @@ const isAuthenticated = () => {
 
 	// Si estás autenticado, evita volver al login
 	if ((path.includes('login.html') || path === '/login' || path.startsWith('/login/')) && isAuthenticated()) {
-		window.location.href = urls.aula;
+		const storedRole = (safeLocalGet('userRole') || '').trim();
+		const dest = storedRole === 'admin' ? '/admin/' : storedRole === 'teacher' ? '/maestro/' : '/aula';
+		window.location.href = dest;
 		return;
 	}
 
 	// Si estás en aula y no estás autenticado, redirigir al login
 	if ((path.includes('/aula') || path.includes('aula.html')) && !isAuthenticated()) {
+		window.location.href = urls.login;
+	}
+
+	// Proteger panel admin: solo role=admin
+	if (path.startsWith('/admin') && isAuthenticated()) {
+		const r = (safeLocalGet('userRole') || '').trim();
+		if (r !== 'admin') { window.location.href = '/aula'; return; }
+	}
+
+	// Proteger panel maestro: solo role=teacher o admin
+	if (path.startsWith('/maestro') && isAuthenticated()) {
+		const r = (safeLocalGet('userRole') || '').trim();
+		if (r !== 'teacher' && r !== 'admin') { window.location.href = '/aula'; return; }
+	}
+
+	// Si no autenticado e intenta admin/maestro → login
+	if ((path.startsWith('/admin') || path.startsWith('/maestro')) && !isAuthenticated()) {
 		window.location.href = urls.login;
 	}
 });

@@ -51,8 +51,9 @@ export async function onRequestPost({ request, env }) {
 		// Migración suave para instalaciones existentes
 		try { await env.DB.prepare('ALTER TABLE users ADD COLUMN grade INTEGER').run(); } catch {}
 		try { await env.DB.prepare('ALTER TABLE users ADD COLUMN group_code TEXT').run(); } catch {}
+		try { await env.DB.prepare("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'student'").run(); } catch {}
 
-		const user = await env.DB.prepare('SELECT id, name, email, password_hash, password_salt, grade, group_code FROM users WHERE email = ?')
+		const user = await env.DB.prepare('SELECT id, name, email, password_hash, password_salt, grade, group_code, role FROM users WHERE email = ?')
 			.bind(email)
 			.first();
 
@@ -72,7 +73,8 @@ export async function onRequestPost({ request, env }) {
 				name: user.name,
 				email: user.email,
 				grade: user.grade ?? null,
-				group: user.group_code ?? null
+				group: user.group_code ?? null,
+				role: user.role || 'student'
 			}
 		});
 	} catch (error) {

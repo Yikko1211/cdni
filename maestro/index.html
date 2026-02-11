@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Maestro | Instituto Abraham Lincoln</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css?v=20260211-1">
+    <style>
+        .teacher-page { padding-top: 100px; background: #f4f4f4; min-height: 100vh; }
+        .teacher-hero { padding: 30px 6% 10px; }
+        .teacher-hero h1 { color: var(--primary); margin-bottom: 6px; }
+        .teacher-hero p { color: #666; }
+
+        .teacher-tabs { display: flex; gap: 0; padding: 0 6%; border-bottom: 2px solid #ddd; margin-bottom: 20px; flex-wrap: wrap; }
+        .teacher-tab { padding: 12px 20px; cursor: pointer; font-weight: 600; color: #888; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .teacher-tab:hover { color: var(--primary); }
+        .teacher-tab.active { color: var(--primary); border-bottom-color: var(--secondary); }
+
+        .teacher-section { display: none; padding: 0 6% 40px; }
+        .teacher-section.active { display: block; }
+
+        .t-card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+        .t-card h3 { color: var(--primary); margin-bottom: 12px; }
+
+        .t-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .t-table th { text-align: left; padding: 10px 8px; border-bottom: 2px solid #ddd; color: var(--primary); font-size: 0.82rem; text-transform: uppercase; }
+        .t-table td { padding: 10px 8px; border-bottom: 1px solid #eee; }
+        .t-table tr:hover { background: #fafafa; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; color: var(--primary); font-size: 0.88rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; font-family: inherit; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+
+        .btn-t { padding: 10px 22px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.88rem; transition: 0.2s; }
+        .btn-t.primary { background: var(--primary); color: #fff; }
+        .btn-t.primary:hover { background: #132d5e; }
+        .btn-t.danger { background: #c00; color: #fff; }
+        .btn-t.small { padding: 5px 12px; font-size: 0.78rem; }
+
+        .msg { padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.88rem; }
+        .msg.ok { background: #e8f5e9; color: #2e7d32; }
+        .msg.err { background: #fce4ec; color: #c62828; }
+
+        .sub-item { display: inline-block; padding: 8px 16px; margin: 4px; background: var(--primary); color: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+        .sub-item:hover { background: var(--secondary); color: var(--primary); }
+
+        @media (max-width: 768px) {
+            .t-table { font-size: 0.78rem; }
+            .t-table th, .t-table td { padding: 8px 4px; }
+            .teacher-tab { padding: 10px 12px; font-size: 0.82rem; }
+        }
+    </style>
+</head>
+<body class="teacher-page is-auth">
+    <header>
+        <div class="logo">
+            <img src="/imagenes/circuloabraham.png" alt="Logo">
+            INSTITUTO ABRAHAM LINCOLN
+        </div>
+        <nav><ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/aula/">Aula</a></li>
+        </ul></nav>
+        <div class="nav-actions">
+            <a class="btn btn-outline btn-logout" href="#">Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <section class="teacher-hero">
+        <h1><i class="fas fa-chalkboard-teacher"></i> Panel del Maestro</h1>
+        <p id="teacherWelcome">Cargando…</p>
+    </section>
+
+    <div class="teacher-tabs">
+        <div class="teacher-tab active" data-tab="subjects"><i class="fas fa-book"></i> Mis Materias</div>
+        <div class="teacher-tab" data-tab="create"><i class="fas fa-plus-circle"></i> Crear Tarea</div>
+        <div class="teacher-tab" data-tab="tasks"><i class="fas fa-tasks"></i> Mis Tareas</div>
+    </div>
+
+    <!-- ===== MIS MATERIAS ===== -->
+    <section class="teacher-section active" id="tab-subjects">
+        <div class="t-card">
+            <h3>Materias asignadas</h3>
+            <p style="color:#666; font-size:0.85rem; margin-bottom:12px;">Estas son las materias que te asignó el administrador. Haz clic en una para ver tareas.</p>
+            <div id="mySubjectsList">Cargando…</div>
+        </div>
+    </section>
+
+    <!-- ===== CREAR TAREA ===== -->
+    <section class="teacher-section" id="tab-create">
+        <div class="t-card">
+            <h3><i class="fas fa-plus-circle"></i> Nueva Tarea</h3>
+            <form id="createTaskForm">
+                <div class="form-group">
+                    <label>Materia</label>
+                    <select id="taskSubject" required><option value="">Cargando…</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="taskTitle" placeholder="Ej: Investigación Cap. 3" required>
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="taskDesc" placeholder="Instrucciones para el alumno…"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Fecha límite (opcional)</label>
+                    <input type="date" id="taskDue">
+                </div>
+                <button type="submit" class="btn-t primary">Crear Tarea</button>
+            </form>
+            <div id="createTaskMsg"></div>
+        </div>
+    </section>
+
+    <!-- ===== MIS TAREAS ===== -->
+    <section class="teacher-section" id="tab-tasks">
+        <div class="t-card">
+            <h3><i class="fas fa-tasks"></i> Tareas publicadas</h3>
+            <div id="myTasksList">Cargando…</div>
+        </div>
+    </section>
+
+    <!-- ===== MODAL: Entregas ===== -->
+    <div id="submissionsModal" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.4); align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:16px; max-width:600px; width:92%; padding:30px; margin:auto; position:relative; top:50%; transform:translateY(-50%); max-height:80vh; overflow:auto;">
+            <h3 style="color:var(--primary); margin-bottom:14px;" id="subModalTitle">Entregas</h3>
+            <div id="subModalContent">Cargando…</div>
+            <button class="btn-t" style="margin-top:14px;" onclick="document.getElementById('submissionsModal').style.display='none'">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="/script.js?v=20260211-1"></script>
+    <script>
+    (() => {
+        const email = () => (localStorage.getItem('userEmail') || '').trim().toLowerCase();
+        const role = () => (localStorage.getItem('userRole') || '').trim();
+
+        if (!['teacher', 'admin'].includes(role())) {
+            document.getElementById('teacherWelcome').textContent = 'Acceso denegado. Solo maestros.';
+            return;
+        }
+        document.getElementById('teacherWelcome').textContent = `Sesión: ${localStorage.getItem('userName') || email()}`;
+
+        // Tabs
+        document.querySelectorAll('.teacher-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.teacher-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.teacher-section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        const api = async (action, method = 'GET', body = null, extra = '') => {
+            const opts = { method, headers: { 'Content-Type': 'application/json', 'x-user-email': email() } };
+            if (body) opts.body = JSON.stringify(body);
+            const r = await fetch(`/api/teacher?action=${action}&teacher_email=${encodeURIComponent(email())}${extra}`, opts);
+            return r.json();
+        };
+
+        let mySubjects = [];
+
+        const loadSubjects = async () => {
+            const el = document.getElementById('mySubjectsList');
+            const sel = document.getElementById('taskSubject');
+            const data = await api('my_subjects');
+            mySubjects = data.subjects || [];
+            if (mySubjects.length === 0) {
+                el.innerHTML = '<p style="color:#888;">No tienes materias asignadas. Pide al admin que te asigne.</p>';
+                sel.innerHTML = '<option value="">— Sin materias —</option>';
+                return;
+            }
+            el.innerHTML = mySubjects.map(s => `<span class="sub-item" onclick="filterTasks('${s.subject_slug}', ${s.grade})">${s.subject_slug.replace(/-/g, ' ').toUpperCase()} — ${s.grade}° ${s.group_code || ''}</span>`).join('');
+            sel.innerHTML = mySubjects.map(s => `<option value="${s.subject_slug}|${s.grade}|${s.group_code || ''}">${s.subject_slug.replace(/-/g, ' ').toUpperCase()} — ${s.grade}° ${s.group_code || ''}</option>`).join('');
+        };
+
+        // Crear tarea
+        document.getElementById('createTaskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msgEl = document.getElementById('createTaskMsg');
+            msgEl.innerHTML = '';
+            const val = document.getElementById('taskSubject').value.split('|');
+            const data = await api('create_task', 'POST', {
+                subject_slug: val[0],
+                grade: Number(val[1]),
+                group_code: val[2] || null,
+                title: document.getElementById('taskTitle').value.trim(),
+                description: document.getElementById('taskDesc').value.trim(),
+                due_date: document.getElementById('taskDue').value || null
+            });
+            msgEl.innerHTML = `<div class="msg ${data.message.includes('creada') ? 'ok' : 'err'}">${data.message}</div>`;
+            if (data.message.includes('creada')) {
+                document.getElementById('createTaskForm').reset();
+                loadTasks();
+            }
+        });
+
+        // Mis tareas
+        const loadTasks = async (subject, grade) => {
+            const el = document.getElementById('myTasksList');
+            let extra = '';
+            if (subject) extra += `&subject=${subject}`;
+            if (grade) extra += `&grade=${grade}`;
+            const data = await api('my_tasks', 'GET', null, extra);
+            const tasks = data.tasks || [];
+            if (tasks.length === 0) { el.innerHTML = '<p style="color:#888;">Sin tareas aún.</p>'; return; }
+            let html = `<table class="t-table"><thead><tr><th>Materia</th><th>Grado</th><th>Título</th><th>Fecha</th><th>Entregas</th><th></th></tr></thead><tbody>`;
+            tasks.forEach(t => {
+                html += `<tr>
+                    <td>${t.subject_slug.replace(/-/g, ' ').toUpperCase()}</td>
+                    <td>${t.grade}° ${t.group_code || ''}</td>
+                    <td><strong>${t.title}</strong></td>
+                    <td>${(t.created_at || '').slice(0, 10)}</td>
+                    <td><button class="btn-t small primary" onclick="viewSubs(${t.id}, '${t.title.replace(/'/g, "\\'")}')">Ver</button></td>
+                    <td><button class="btn-t small danger" onclick="delTask(${t.id})">×</button></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            el.innerHTML = html;
+        };
+
+        window.filterTasks = (subject, grade) => {
+            document.querySelectorAll('.teacher-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.teacher-section').forEach(s => s.classList.remove('active'));
+            document.querySelector('[data-tab="tasks"]').classList.add('active');
+            document.getElementById('tab-tasks').classList.add('active');
+            loadTasks(subject, grade);
+        };
+
+        window.delTask = async (id) => {
+            if (!confirm('¿Eliminar esta tarea y sus entregas?')) return;
+            await api('delete_task', 'POST', { task_id: id });
+            loadTasks();
+        };
+
+        window.viewSubs = async (taskId, title) => {
+            document.getElementById('subModalTitle').textContent = `Entregas: ${title}`;
+            document.getElementById('subModalContent').textContent = 'Cargando…';
+            document.getElementById('submissionsModal').style.display = 'block';
+            const data = await api('submissions', 'GET', null, `&task_id=${taskId}`);
+            const subs = data.submissions || [];
+            if (subs.length === 0) { document.getElementById('subModalContent').innerHTML = '<p style="color:#888;">Nadie ha entregado aún.</p>'; return; }
+            let html = `<table class="t-table"><thead><tr><th>Alumno</th><th>Grado</th><th>Respuesta</th><th>Enlace</th><th>Fecha</th></tr></thead><tbody>`;
+            subs.forEach(s => {
+                html += `<tr>
+                    <td>${s.student_name || s.user_email}</td>
+                    <td>${s.student_grade ? s.student_grade + '° ' + (s.student_group || '') : '—'}</td>
+                    <td>${s.answer_text || '—'}</td>
+                    <td>${s.file_url ? `<a href="${s.file_url}" target="_blank">Abrir</a>` : '—'}</td>
+                    <td>${(s.created_at || '').slice(0, 16).replace('T', ' ')}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            document.getElementById('subModalContent').innerHTML = html;
+        };
+
+        // Init
+        loadSubjects();
+        loadTasks();
+    })();
+    </script>
+</body>
+</html>

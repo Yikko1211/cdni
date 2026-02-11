@@ -137,11 +137,64 @@ signUpBtn.addEventListener('click', showRegister);
 signInBtn.addEventListener('click', showLogin);
 
 const setViewFromHash = () => {
-	if (window.location.hash === '#register') showRegister();
+	const hash = window.location.hash || '';
+	if (hash === '#register') showRegister();
+	else if (hash.startsWith('#invite=')) showInviteForm(hash.replace('#invite=', ''));
 	else showLogin();
 };
 
-// Soportar link directo a registro/login
+// Formulario de registro por invitación (maestros)
+const showInviteForm = (token) => {
+	if (!token) return showLogin();
+	loginForm.classList.add('hidden');
+	registerForm.classList.add('hidden');
+	if (overlayLogin) overlayLogin.classList.add('hidden');
+	if (overlayRegister) overlayRegister.classList.add('hidden');
+
+	let invForm = document.getElementById('inviteRegForm');
+	if (!invForm) {
+		const wrapper = document.querySelector('.login-container') || document.querySelector('.login-wrapper');
+		if (!wrapper) return;
+		invForm = document.createElement('div');
+		invForm.id = 'inviteRegForm';
+		invForm.className = 'login-form';
+		invForm.innerHTML = `
+			<h2>Registro por Invitación</h2>
+			<span>Crea tu cuenta de maestro</span>
+			<form id="inviteFormEl" style="margin-top:20px;">
+				<input type="hidden" id="inviteToken" value="${token}">
+				<div class="input-group"><i class="fas fa-user"></i><input id="inviteName" type="text" placeholder="Nombre completo" required></div>
+				<div class="input-group"><i class="fas fa-lock"></i><input id="invitePassword" type="password" placeholder="Contraseña (min 6)" required></div>
+				<button type="submit">Crear Cuenta</button>
+				<div class="form-message" id="inviteMessage"></div>
+			</form>
+		`;
+		wrapper.insertBefore(invForm, wrapper.firstChild);
+
+		document.getElementById('inviteFormEl').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const msgEl = document.getElementById('inviteMessage');
+			setMessage(msgEl, '', null);
+			const name = document.getElementById('inviteName').value.trim();
+			const password = document.getElementById('invitePassword').value.trim();
+			const tk = document.getElementById('inviteToken').value.trim();
+			try {
+				const res = await fetch('/api/invite-register', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ token: tk, name, password })
+				});
+				const data = await res.json();
+				if (!res.ok) { setMessage(msgEl, data?.message || 'Error', 'error'); return; }
+				setMessage(msgEl, 'Cuenta creada. Ya puedes iniciar sesión.', 'success');
+				setTimeout(() => { window.location.hash = ''; showLogin(); }, 1500);
+			} catch { setMessage(msgEl, 'Error de conexión.', 'error'); }
+		});
+	}
+	invForm.classList.remove('hidden');
+};
+
+// Soportar link directo a registro/login/invite
 window.addEventListener('hashchange', setViewFromHash);
 setViewFromHash();
 
@@ -194,9 +247,11 @@ const setAuthCookie = () => {
 	}
 };
 
-// Si ya hay sesión iniciada, no mostrar login
+// Si ya hay sesión iniciada, redirigir según role
 if (safeLocalGet('auth') === '1' || getCookie('auth') === '1') {
-	window.location.href = '/aula';
+	const storedRole = (safeLocalGet('userRole') || '').trim();
+	const dest = storedRole === 'admin' ? '/admin/' : storedRole === 'teacher' ? '/maestro/' : '/aula';
+	window.location.href = dest;
 }
 
 const setMessage = (el, text, type) => {
@@ -268,14 +323,18 @@ loginFormElement.addEventListener('submit', async (event) => {
 		safeLocalSet('authBool', 'true');
 		if (data?.user?.name) safeLocalSet('userName', data.user.name);
 		if (data?.user?.email) safeLocalSet('userEmail', data.user.email);
+		const userRole = data?.user?.role || 'student';
+		safeLocalSet('userRole', userRole);
 		// Grado/Grupo se guardan desde el usuario registrado (DB)
 		const finalGrade = normalizeGrade(data?.user?.grade);
 		const finalGroup = normalizeGroup(data?.user?.group);
 		if (finalGrade) safeLocalSet('userGrade', String(finalGrade));
 		if (finalGroup) safeLocalSet('userGroup', finalGroup);
 		if (!data?.user?.email && email) safeLocalSet('userEmail', email);
-		setMessageLink(loginMessage, 'Sesión iniciada. Si no te redirige, entra a', '/aula', 'Aula', 'success');
-		const target = new URL('/aula', window.location.origin).toString();
+		// Redirigir según role
+		const roleTarget = userRole === 'admin' ? '/admin/' : userRole === 'teacher' ? '/maestro/' : '/aula';
+		setMessageLink(loginMessage, 'Sesión iniciada. Si no te redirige, entra a', roleTarget, roleTarget === '/aula' ? 'Aula' : 'Panel', 'success');
+		const target = new URL(roleTarget, window.location.origin).toString();
 		// Redirección confiable (replace evita volver atrás al login)
 		try {
 			window.location.replace(target);

@@ -67,6 +67,7 @@ export async function onRequestPost({ request, env }) {
 		// Migración suave para instalaciones existentes
 		try { await env.DB.prepare('ALTER TABLE users ADD COLUMN grade INTEGER').run(); } catch {}
 		try { await env.DB.prepare('ALTER TABLE users ADD COLUMN group_code TEXT').run(); } catch {}
+		try { await env.DB.prepare("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'student'").run(); } catch {}
 
 		const existing = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
 		if (existing) {
