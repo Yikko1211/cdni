@@ -14,14 +14,57 @@
 		toggleBtn.innerHTML = '<span class="nav-toggle-icon" aria-hidden="true"></span>';
 		header.appendChild(toggleBtn);
 
+		const setHeaderHeightVar = () => {
+			const h = Math.ceil(header.getBoundingClientRect().height);
+			document.documentElement.style.setProperty('--header-h', `${h}px`);
+		};
+
+		const ensureOverlay = () => {
+			let overlay = document.querySelector('.mobile-nav-overlay');
+			if (overlay) return overlay;
+			overlay = document.createElement('div');
+			overlay.className = 'mobile-nav-overlay';
+			overlay.innerHTML = `
+				<div class="mobile-nav-backdrop" aria-hidden="true"></div>
+				<div class="mobile-nav-sheet" role="navigation">
+					<div class="mobile-nav-links"></div>
+					<div class="mobile-nav-actions"></div>
+				</div>
+			`;
+			document.body.appendChild(overlay);
+			overlay.addEventListener('click', (event) => {
+				if (event.target && event.target.classList?.contains('mobile-nav-backdrop')) {
+					closeMenu();
+				}
+			});
+			return overlay;
+		};
+
+		const renderOverlay = () => {
+			const overlay = ensureOverlay();
+			const linksHost = overlay.querySelector('.mobile-nav-links');
+			const actionsHost = overlay.querySelector('.mobile-nav-actions');
+			if (linksHost) linksHost.innerHTML = '';
+			if (actionsHost) actionsHost.innerHTML = '';
+			const ul = header.querySelector('nav ul');
+			if (ul && linksHost) {
+				linksHost.appendChild(ul.cloneNode(true));
+				linksHost.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => closeMenu()));
+			}
+		};
+
 		const closeMenu = () => {
-			header.classList.remove('nav-open');
+			document.body.classList.remove('nav-overlay-open');
+			document.body.classList.remove('no-scroll');
 			toggleBtn.setAttribute('aria-expanded', 'false');
 			toggleBtn.setAttribute('aria-label', 'Abrir menú');
 		};
 
 		const openMenu = () => {
-			header.classList.add('nav-open');
+			setHeaderHeightVar();
+			renderOverlay();
+			document.body.classList.add('nav-overlay-open');
+			document.body.classList.add('no-scroll');
 			toggleBtn.setAttribute('aria-expanded', 'true');
 			toggleBtn.setAttribute('aria-label', 'Cerrar menú');
 		};
@@ -32,13 +75,14 @@
 			else openMenu();
 		});
 
-		header.querySelectorAll('nav a').forEach((a) => a.addEventListener('click', closeMenu));
-		document.addEventListener('click', (event) => {
-			if (!header.contains(event.target)) closeMenu();
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') closeMenu();
 		});
 		window.addEventListener('resize', () => {
+			setHeaderHeightVar();
 			if (!window.matchMedia('(max-width: 768px)').matches) closeMenu();
 		});
+		setHeaderHeightVar();
 	};
 
 	initMobileNav();

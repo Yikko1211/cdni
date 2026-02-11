@@ -95,14 +95,66 @@ const isAuthenticated = () => {
 			header.appendChild(toggleBtn);
 		}
 
+		const setHeaderHeightVar = () => {
+			const h = Math.ceil(header.getBoundingClientRect().height);
+			document.documentElement.style.setProperty('--header-h', `${h}px`);
+		};
+
+		const ensureOverlay = () => {
+			let overlay = document.querySelector('.mobile-nav-overlay');
+			if (overlay) return overlay;
+			overlay = document.createElement('div');
+			overlay.className = 'mobile-nav-overlay';
+			overlay.innerHTML = `
+				<div class="mobile-nav-backdrop" aria-hidden="true"></div>
+				<div class="mobile-nav-sheet" role="navigation">
+					<div class="mobile-nav-links"></div>
+					<div class="mobile-nav-actions"></div>
+				</div>
+			`;
+			document.body.appendChild(overlay);
+
+			// Cerrar por backdrop
+			overlay.addEventListener('click', (event) => {
+				if (event.target && event.target.classList?.contains('mobile-nav-backdrop')) {
+					closeMenu();
+				}
+			});
+			return overlay;
+		};
+
+		const renderOverlay = () => {
+			const overlay = ensureOverlay();
+			const linksHost = overlay.querySelector('.mobile-nav-links');
+			const actionsHost = overlay.querySelector('.mobile-nav-actions');
+			if (linksHost) linksHost.innerHTML = '';
+			if (actionsHost) actionsHost.innerHTML = '';
+
+			const ul = header.querySelector('nav ul');
+			if (ul && linksHost) {
+				linksHost.appendChild(ul.cloneNode(true));
+				linksHost.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => closeMenu()));
+			}
+
+			const actions = header.querySelector('.nav-actions');
+			if (actions && actionsHost) {
+				actionsHost.innerHTML = actions.innerHTML;
+				actionsHost.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => closeMenu()));
+			}
+		};
+
 		const closeMenu = () => {
-			header.classList.remove('nav-open');
+			document.body.classList.remove('nav-overlay-open');
+			document.body.classList.remove('no-scroll');
 			toggleBtn.setAttribute('aria-expanded', 'false');
 			toggleBtn.setAttribute('aria-label', 'Abrir menú');
 		};
 
 		const openMenu = () => {
-			header.classList.add('nav-open');
+			setHeaderHeightVar();
+			renderOverlay();
+			document.body.classList.add('nav-overlay-open');
+			document.body.classList.add('no-scroll');
 			toggleBtn.setAttribute('aria-expanded', 'true');
 			toggleBtn.setAttribute('aria-label', 'Cerrar menú');
 		};
@@ -113,22 +165,21 @@ const isAuthenticated = () => {
 			else openMenu();
 		});
 
-		// Cerrar al navegar
-		header.querySelectorAll('nav a').forEach((a) => {
-			a.addEventListener('click', () => closeMenu());
-		});
-
-		// Cerrar al click afuera
-		document.addEventListener('click', (event) => {
-			if (!header.contains(event.target)) closeMenu();
+		// Cerrar con Esc
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') closeMenu();
 		});
 
 		// Si se agranda la pantalla, cerrar
 		window.addEventListener('resize', () => {
+			setHeaderHeightVar();
 			if (!window.matchMedia('(max-width: 768px)').matches) {
 				closeMenu();
 			}
 		});
+
+		// Inicial
+		setHeaderHeightVar();
 	};
 
 	document.addEventListener('DOMContentLoaded', () => {
@@ -166,28 +217,32 @@ const isAuthenticated = () => {
 		}
 	}
 
-	// Logout (después de renderizar botones)
-	document.querySelectorAll('.btn-logout').forEach((btn) => {
-		btn.addEventListener('click', (event) => {
-			event.preventDefault();
-			try {
-				localStorage.removeItem('auth');
-				localStorage.removeItem('authBool');
-				localStorage.removeItem('userName');
-				localStorage.removeItem('userEmail');
-				localStorage.removeItem('userGrade');
-				localStorage.removeItem('userGroup');
-			} catch {
-				// ignore
-			}
-			const expire = 'auth=; Path=/; Max-Age=0; SameSite=Lax';
-			document.cookie = expire;
-			if (window.location.protocol === 'https:') {
-				document.cookie = `${expire}; secure`;
-			}
-			document.body.classList.remove('is-auth');
-			window.location.href = urls.home;
-		});
+	// Logout (delegado: soporta botones clonados en overlay)
+	const doLogout = () => {
+		try {
+			localStorage.removeItem('auth');
+			localStorage.removeItem('authBool');
+			localStorage.removeItem('userName');
+			localStorage.removeItem('userEmail');
+			localStorage.removeItem('userGrade');
+			localStorage.removeItem('userGroup');
+		} catch {
+			// ignore
+		}
+		const expire = 'auth=; Path=/; Max-Age=0; SameSite=Lax';
+		document.cookie = expire;
+		if (window.location.protocol === 'https:') {
+			document.cookie = `${expire}; secure`;
+		}
+		document.body.classList.remove('is-auth');
+		window.location.href = urls.home;
+	};
+
+	document.addEventListener('click', (event) => {
+		const btn = event.target?.closest?.('.btn-logout');
+		if (!btn) return;
+		event.preventDefault();
+		doLogout();
 	});
 
 	// Mostrar bienvenida en aula
