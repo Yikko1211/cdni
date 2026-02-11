@@ -46,6 +46,39 @@ header {
 	transition: all 0.3s ease;
 }
 
+header.scrolled {
+	padding: 0.5rem 5%;
+	background-color: rgba(10, 31, 68, 0.95);
+}
+
+.nav-toggle {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 12px;
+	border: 1px solid rgba(255,255,255,0.25);
+	background: rgba(255,255,255,0.06);
+	color: var(--white);
+	cursor: pointer;
+	transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.nav-toggle:active {
+	transform: scale(0.98);
+}
+
+.nav-toggle-icon {
+	position: relative;
+	width: 18px;
+	height: 2px;
+	background: var(--white);
+	display: block;
+	border-radius: 2px;
+	box-shadow: 0 -6px 0 var(--white), 0 6px 0 var(--white);
+}
+
 .nav-actions {
 	display: flex;
 	align-items: center;
@@ -362,22 +395,72 @@ footer {
 /* --- RESPONSIVE --- */
 @media (max-width: 768px) {
 	.hero h1 { font-size: 2.5rem; }
-	nav ul {
-		display: flex;
+	.hero { background-attachment: scroll; }
+	header { padding: 0.75rem 4%; }
+	header.scrolled { padding: 0.55rem 4%; }
+
+	.logo {
+		font-size: 1.05rem;
+		letter-spacing: 0.5px;
+		gap: 8px;
+		min-width: 0;
+	}
+
+	.logo img {
+		width: 30px;
+		height: 30px;
+	}
+
+	nav ul { gap: 12px; }
+
+	.btn.btn-outline,
+	.btn.btn-solid {
+		padding: 7px 14px;
+		font-size: 0.82rem;
+	}
+
+	.quote-text { font-size: 1.4rem; }
+
+	/* Modo compacto (solo cuando JS agrega body.js-nav) */
+	body.js-nav header { flex-wrap: nowrap; gap: 10px; }
+	body.js-nav nav,
+	body.js-nav .nav-actions { display: none; }
+	body.js-nav .nav-toggle { display: inline-flex; }
+
+	body.js-nav header.nav-open {
 		flex-wrap: wrap;
-		justify-content: center;
-		gap: 14px;
+		align-items: flex-start;
+	}
+
+	body.js-nav header.nav-open nav {
+		display: block;
 		width: 100%;
 	}
-	.quote-text { font-size: 1.4rem; }
-	header { flex-wrap: wrap; gap: 10px; }
-	.logo { width: 100%; justify-content: center; }
-	.nav-actions {
+
+	body.js-nav header.nav-open nav ul {
+		flex-direction: column;
+		gap: 0;
+		width: 100%;
+		padding: 6px 0 2px;
+	}
+
+	body.js-nav header.nav-open nav a {
+		display: block;
+		padding: 12px 10px;
+		border-top: 1px solid rgba(255,255,255,0.12);
+	}
+
+	body.js-nav header.nav-open .nav-actions {
 		display: flex;
+		flex-direction: column;
+		width: 100%;
+		gap: 10px;
+		padding: 10px 0 6px;
+	}
+
+	body.js-nav header.nav-open .nav-actions .btn {
 		width: 100%;
 		justify-content: center;
-		flex-wrap: wrap;
-		gap: 10px;
 	}
 }
 

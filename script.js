@@ -1,24 +1,22 @@
-
-// Inicializar animaciones
-if (window.AOS) {
-	AOS.init({
-		duration: 1000, // Duración de la animación en milisegundos
-		once: true,     // La animación solo ocurre una vez al bajar
-		offset: 100     // Offset (en px) desde el borde inferior original para activar la animación
-	});
-}
-
-// Efecto Navbar transparente a sólido
-window.addEventListener('scroll', function() {
-	const header = document.querySelector('header');
-	if (window.scrollY > 50) {
-		header.style.padding = '0.5rem 5%';
-		header.style.backgroundColor = 'rgba(10, 31, 68, 0.95)';
-	} else {
-		header.style.padding = '1rem 5%';
-		header.style.backgroundColor = '#0a1f44';
+(() => {
+	// Inicializar animaciones
+	if (window.AOS) {
+		AOS.init({
+			duration: 1000, // Duración de la animación en milisegundos
+			once: true,     // La animación solo ocurre una vez al bajar
+			offset: 100     // Offset (en px) desde el borde inferior original para activar la animación
+		});
 	}
-});
+
+	// Efecto Navbar (CSS por clase, evita inline-styles que rompen responsive)
+	const updateHeaderOnScroll = () => {
+		const header = document.querySelector('header');
+		if (!header) return;
+		header.classList.toggle('scrolled', window.scrollY > 50);
+	};
+
+	window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
+	updateHeaderOnScroll();
 
 const getCookie = (name) => {
 	const part = document.cookie
@@ -76,7 +74,65 @@ const isAuthenticated = () => {
 	return authFlag === '1' || authFlag === 'true' || cookieAuth === '1' || hasUser;
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+	const initMobileNav = () => {
+		const header = document.querySelector('header');
+		if (!header) return;
+
+		document.body.classList.add('js-nav');
+
+		if (header.querySelector('.nav-toggle')) return;
+		const toggleBtn = document.createElement('button');
+		toggleBtn.type = 'button';
+		toggleBtn.className = 'nav-toggle';
+		toggleBtn.setAttribute('aria-label', 'Abrir menú');
+		toggleBtn.setAttribute('aria-expanded', 'false');
+		toggleBtn.innerHTML = '<span class="nav-toggle-icon" aria-hidden="true"></span>';
+
+		const actions = header.querySelector('.nav-actions');
+		if (actions) {
+			header.insertBefore(toggleBtn, actions);
+		} else {
+			header.appendChild(toggleBtn);
+		}
+
+		const closeMenu = () => {
+			header.classList.remove('nav-open');
+			toggleBtn.setAttribute('aria-expanded', 'false');
+			toggleBtn.setAttribute('aria-label', 'Abrir menú');
+		};
+
+		const openMenu = () => {
+			header.classList.add('nav-open');
+			toggleBtn.setAttribute('aria-expanded', 'true');
+			toggleBtn.setAttribute('aria-label', 'Cerrar menú');
+		};
+
+		toggleBtn.addEventListener('click', () => {
+			const isOpen = header.classList.contains('nav-open');
+			if (isOpen) closeMenu();
+			else openMenu();
+		});
+
+		// Cerrar al navegar
+		header.querySelectorAll('nav a').forEach((a) => {
+			a.addEventListener('click', () => closeMenu());
+		});
+
+		// Cerrar al click afuera
+		document.addEventListener('click', (event) => {
+			if (!header.contains(event.target)) closeMenu();
+		});
+
+		// Si se agranda la pantalla, cerrar
+		window.addEventListener('resize', () => {
+			if (!window.matchMedia('(max-width: 768px)').matches) {
+				closeMenu();
+			}
+		});
+	};
+
+	document.addEventListener('DOMContentLoaded', () => {
+		initMobileNav();
 	const urls = { home: '/', login: '/login/', aula: '/aula' };
 	const authed = isAuthenticated();
 	if (authed) {
@@ -144,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const extra = (grade && group) ? ` · ${grade}° ${group}` : '';
 		welcomeEl.textContent = label ? `Sesión iniciada como: ${label}${extra}` : '';
 	}
+
 
 	// Completar perfil si faltan datos (solo dentro de /aula/*)
 	const path = window.location.pathname;
@@ -576,4 +633,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		window.location.href = urls.login;
 	}
 });
+
+})();
 

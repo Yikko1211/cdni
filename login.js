@@ -1,8 +1,53 @@
-// Lógica simple para cambiar entre Login y Registro
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const overlayLogin = document.getElementById('overlayLogin');
-const overlayRegister = document.getElementById('overlayRegister');
+(() => {
+	const initMobileNav = () => {
+		const header = document.querySelector('header');
+		if (!header) return;
+
+		document.body.classList.add('js-nav');
+
+		if (header.querySelector('.nav-toggle')) return;
+		const toggleBtn = document.createElement('button');
+		toggleBtn.type = 'button';
+		toggleBtn.className = 'nav-toggle';
+		toggleBtn.setAttribute('aria-label', 'Abrir menú');
+		toggleBtn.setAttribute('aria-expanded', 'false');
+		toggleBtn.innerHTML = '<span class="nav-toggle-icon" aria-hidden="true"></span>';
+		header.appendChild(toggleBtn);
+
+		const closeMenu = () => {
+			header.classList.remove('nav-open');
+			toggleBtn.setAttribute('aria-expanded', 'false');
+			toggleBtn.setAttribute('aria-label', 'Abrir menú');
+		};
+
+		const openMenu = () => {
+			header.classList.add('nav-open');
+			toggleBtn.setAttribute('aria-expanded', 'true');
+			toggleBtn.setAttribute('aria-label', 'Cerrar menú');
+		};
+
+		toggleBtn.addEventListener('click', () => {
+			const isOpen = header.classList.contains('nav-open');
+			if (isOpen) closeMenu();
+			else openMenu();
+		});
+
+		header.querySelectorAll('nav a').forEach((a) => a.addEventListener('click', closeMenu));
+		document.addEventListener('click', (event) => {
+			if (!header.contains(event.target)) closeMenu();
+		});
+		window.addEventListener('resize', () => {
+			if (!window.matchMedia('(max-width: 768px)').matches) closeMenu();
+		});
+	};
+
+	initMobileNav();
+
+	// Lógica simple para cambiar entre Login y Registro
+	const loginForm = document.getElementById('loginForm');
+	const registerForm = document.getElementById('registerForm');
+	const overlayLogin = document.getElementById('overlayLogin');
+	const overlayRegister = document.getElementById('overlayRegister');
 
 const signUpBtn = document.getElementById('signUpBtn');
 const signInBtn = document.getElementById('signInBtn');
@@ -241,3 +286,5 @@ registerFormElement.addEventListener('submit', async (event) => {
 		);
 	}
 });
+
+})();
