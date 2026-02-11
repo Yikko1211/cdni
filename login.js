@@ -139,8 +139,34 @@ signInBtn.addEventListener('click', showLogin);
 const setViewFromHash = () => {
 	const hash = window.location.hash || '';
 	if (hash === '#register') showRegister();
-	else if (hash.startsWith('#invite=')) showInviteForm(hash.replace('#invite=', ''));
+	else if (hash.startsWith('#invite=')) {
+		// Si no tiene sesión, mostrar login con mensaje de que inicie sesión primero
+		showInviteLogin(hash.replace('#invite=', ''));
+	}
 	else showLogin();
+};
+
+// Mostrar login con contexto de invitación (para usuarios sin sesión)
+const showInviteLogin = (token) => {
+	if (!token) return showLogin();
+	// Guardar token para usarlo después del login
+	sessionStorage.setItem('pendingInviteToken', token);
+
+	showLogin();
+
+	// Agregar banner informativo arriba del formulario de login
+	let banner = document.getElementById('inviteBanner');
+	if (!banner && loginForm) {
+		banner = document.createElement('div');
+		banner.id = 'inviteBanner';
+		banner.style.cssText = 'background:linear-gradient(135deg,#0a1f44,#132d5e);color:#fff;padding:16px 20px;border-radius:12px;margin-bottom:18px;text-align:center;font-size:0.9rem;';
+		banner.innerHTML = `<i class="fas fa-envelope-open-text" style="font-size:1.3rem;color:#c5a059;display:block;margin-bottom:8px;"></i><strong style="color:#c5a059;">Tienes una invitación de maestro</strong><br><span style="opacity:0.85;">Inicia sesión con tu cuenta para activarla.</span><br><a href="#" id="inviteNewAcct" style="color:#c5a059;text-decoration:underline;font-size:0.82rem;margin-top:6px;display:inline-block;">¿No tienes cuenta? Crea una aquí</a>`;
+		loginForm.insertBefore(banner, loginForm.firstChild);
+		document.getElementById('inviteNewAcct').addEventListener('click', (e) => {
+			e.preventDefault();
+			showInviteForm(token);
+		});
+	}
 };
 
 // Formulario de registro por invitación (maestros)
@@ -247,8 +273,51 @@ const setAuthCookie = () => {
 	}
 };
 
-// Si ya hay sesión iniciada, redirigir según role
+// Si ya hay sesión iniciada
 if (safeLocalGet('auth') === '1' || getCookie('auth') === '1') {
+	const hash = window.location.hash || '';
+	// Si tiene un token de invitación, aplicarlo automáticamente
+	if (hash.startsWith('#invite=')) {
+		const invToken = hash.replace('#invite=', '');
+		const userEmail = (safeLocalGet('userEmail') || '').trim().toLowerCase();
+		if (invToken && userEmail) {
+			(async () => {
+				try {
+					const container = document.querySelector('.login-container') || document.querySelector('.login-wrapper') || document.body;
+					// Mostrar indicador de carga
+					let statusDiv = document.getElementById('inviteAutoStatus');
+					if (!statusDiv) {
+						statusDiv = document.createElement('div');
+						statusDiv.id = 'inviteAutoStatus';
+						statusDiv.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(10,31,68,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Poppins,sans-serif;';
+						statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:2rem;margin-bottom:16px;color:#c5a059;"></i><p style="font-size:1.1rem;">Aplicando invitación…</p>';
+						document.body.appendChild(statusDiv);
+					}
+
+					const res = await fetch('/api/accept-invite', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ token: invToken, email: userEmail })
+					});
+					const data = await res.json();
+
+					if (res.ok && data.user) {
+						// Actualizar rol en localStorage
+						safeLocalSet('userRole', data.user.role);
+						statusDiv.innerHTML = `<i class="fas fa-check-circle" style="font-size:2.5rem;margin-bottom:16px;color:#4caf50;"></i><p style="font-size:1.1rem;">${data.message}</p><p style="margin-top:10px;color:#c5a059;">Redirigiendo…</p>`;
+						const dest = data.user.role === 'admin' ? '/admin/' : data.user.role === 'teacher' ? '/maestro/' : '/aula';
+						setTimeout(() => { window.location.href = dest; }, 1500);
+					} else {
+						statusDiv.innerHTML = `<i class="fas fa-exclamation-circle" style="font-size:2.5rem;margin-bottom:16px;color:#f44336;"></i><p style="font-size:1.1rem;">${data.message || 'Error al aplicar la invitación.'}</p><a href="/aula" style="margin-top:16px;color:#c5a059;text-decoration:underline;">Ir al Aula</a>`;
+					}
+				} catch {
+					const statusDiv = document.getElementById('inviteAutoStatus');
+					if (statusDiv) statusDiv.innerHTML = '<i class="fas fa-exclamation-circle" style="font-size:2.5rem;margin-bottom:16px;color:#f44336;"></i><p>Error de conexión.</p><a href="/aula" style="margin-top:16px;color:#c5a059;text-decoration:underline;">Ir al Aula</a>';
+				}
+			})();
+			return; // No redirigir al aula todavía
+		}
+	}
 	const storedRole = (safeLocalGet('userRole') || '').trim();
 	const dest = storedRole === 'admin' ? '/admin/' : storedRole === 'teacher' ? '/maestro/' : '/aula';
 	window.location.href = dest;
@@ -323,7 +392,7 @@ loginFormElement.addEventListener('submit', async (event) => {
 		safeLocalSet('authBool', 'true');
 		if (data?.user?.name) safeLocalSet('userName', data.user.name);
 		if (data?.user?.email) safeLocalSet('userEmail', data.user.email);
-		const userRole = data?.user?.role || 'student';
+		let userRole = data?.user?.role || 'student';
 		safeLocalSet('userRole', userRole);
 		// Grado/Grupo se guardan desde el usuario registrado (DB)
 		const finalGrade = normalizeGrade(data?.user?.grade);
@@ -331,6 +400,32 @@ loginFormElement.addEventListener('submit', async (event) => {
 		if (finalGrade) safeLocalSet('userGrade', String(finalGrade));
 		if (finalGroup) safeLocalSet('userGroup', finalGroup);
 		if (!data?.user?.email && email) safeLocalSet('userEmail', email);
+
+		// Comprobar si hay una invitación pendiente por aplicar
+		const pendingToken = sessionStorage.getItem('pendingInviteToken');
+		if (pendingToken) {
+			sessionStorage.removeItem('pendingInviteToken');
+			setMessage(loginMessage, 'Aplicando invitación…', 'success');
+			try {
+				const invRes = await fetch('/api/accept-invite', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ token: pendingToken, email: data?.user?.email || email })
+				});
+				const invData = await invRes.json();
+				if (invRes.ok && invData.user) {
+					userRole = invData.user.role;
+					safeLocalSet('userRole', userRole);
+					setMessage(loginMessage, invData.message, 'success');
+				} else {
+					// Si falla la invitación, aún puede entrar normalmente
+					setMessage(loginMessage, invData.message || 'No se pudo aplicar la invitación, pero tu sesión está activa.', 'error');
+				}
+			} catch {
+				// Ignore — redirigir con rol actual
+			}
+		}
+
 		// Redirigir según role
 		const roleTarget = userRole === 'admin' ? '/admin/' : userRole === 'teacher' ? '/maestro/' : '/aula';
 		setMessageLink(loginMessage, 'Sesión iniciada. Si no te redirige, entra a', roleTarget, roleTarget === '/aula' ? 'Aula' : 'Panel', 'success');
