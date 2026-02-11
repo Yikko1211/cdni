@@ -6,7 +6,7 @@
     <title>Panel Admin | Instituto Abraham Lincoln</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/style.css?v=20260211-7">
+    <link rel="stylesheet" href="/style.css?v=20260211-8">
     <style>
         .admin-page { padding-top: 100px; background: #f4f4f4; min-height: 100vh; }
         .admin-hero { padding: 30px 6% 10px; }
@@ -99,20 +99,20 @@
     <section class="admin-section" id="tab-invite">
         <div class="admin-card">
             <h3><i class="fas fa-paper-plane"></i> Crear Invitación</h3>
-            <p style=\"color:#666; margin-bottom:14px; font-size:0.88rem;\">Genera un link de invitación. El maestro lo abre, crea su contraseña y queda activo. Luego puedes asignarle materias desde la pestaña Maestros.</p>
-            <form id=\"inviteForm\">
-                <div class=\"form-group\">
+            <p style="color:#666; margin-bottom:14px; font-size:0.88rem;">Genera un link de invitación. El maestro lo abre, crea su contraseña y queda activo. Luego puedes asignarle materias desde la pestaña Maestros.</p>
+            <form id="inviteForm">
+                <div class="form-group">
                     <label>Correo del maestro</label>
-                    <input type=\"email\" id=\"inviteEmail\" placeholder=\"maestro@lincoln.edu.mx\" required>
+                    <input type="email" id="inviteEmail" placeholder="maestro@lincoln.edu.mx" required>
                 </div>
-                <div class=\"form-group\">
+                <div class="form-group">
                     <label>Rol</label>
-                    <select id=\"inviteRole\">
-                        <option value=\"teacher\">Maestro</option>
-                        <option value=\"admin\">Admin</option>
+                    <select id="inviteRole">
+                        <option value="teacher">Maestro</option>
+                        <option value="admin">Admin</option>
                     </select>
                 </div>
-                <button type=\"submit\" class=\"btn-admin primary\"><i class=\"fas fa-paper-plane\"></i> Crear Invitación</button>
+                <button type="submit" class="btn-admin primary"><i class="fas fa-paper-plane"></i> Crear Invitación</button>
             </form>
             <div id="inviteResult"></div>
         </div>
@@ -145,7 +145,7 @@
         </div>
     </div>
 
-    <script src="/script.js?v=20260211-7"></script>
+    <script src="/script.js?v=20260211-8"></script>
     <script>
     (() => {
         const email = () => (localStorage.getItem('userEmail') || '').trim().toLowerCase();

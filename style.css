@@ -109,8 +109,6 @@ body.is-role-admin .nav-actions .btn-admin-panel,
 body.is-role-admin .mobile-nav-actions .btn-admin-panel { display: inline-flex; }
 body.is-role-teacher .nav-actions .btn-teacher-panel,
 body.is-role-teacher .mobile-nav-actions .btn-teacher-panel { display: inline-flex; }
-body.is-role-admin .nav-actions .btn-teacher-panel,
-body.is-role-admin .mobile-nav-actions .btn-teacher-panel { display: inline-flex; }
 
 .btn.btn-accent {
 	background: var(--secondary);
