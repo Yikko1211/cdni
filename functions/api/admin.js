@@ -106,6 +106,12 @@ export async function onRequest({ request, env }) {
 			if (!['admin', 'teacher', 'student'].includes(newRole)) return jsonResponse(400, { message: 'Role inválido.' });
 			if (userId === admin.id) return jsonResponse(400, { message: 'No puedes cambiar tu propio role.' });
 			await env.DB.prepare('UPDATE users SET role = ? WHERE id = ?').bind(newRole, userId).run();
+			// Create teacher_profile if promoting to teacher
+			if (newRole === 'teacher') {
+				await env.DB.prepare(
+					`INSERT OR IGNORE INTO teacher_profiles (user_id) VALUES (?)`
+				).bind(userId).run();
+			}
 			return jsonResponse(200, { message: `Role actualizado a "${newRole}".` });
 		}
 

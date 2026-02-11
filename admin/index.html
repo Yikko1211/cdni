@@ -6,7 +6,7 @@
     <title>Panel Admin | Instituto Abraham Lincoln</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/style.css?v=20260211-5">
+    <link rel="stylesheet" href="/style.css?v=20260211-6">
     <style>
         .admin-page { padding-top: 100px; background: #f4f4f4; min-height: 100vh; }
         .admin-hero { padding: 30px 6% 10px; }
@@ -205,7 +205,7 @@
         </div>
     </div>
 
-    <script src="/script.js?v=20260211-5"></script>
+    <script src="/script.js?v=20260211-6"></script>
     <script>
     (() => {
         const email = () => (localStorage.getItem('userEmail') || '').trim().toLowerCase();
@@ -427,12 +427,13 @@
             if (!data.users || data.users.length === 0) { el.innerHTML = '<p style="color:#888;">Sin usuarios.</p>'; return; }
             let html = `<table class="admin-table"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Grado</th><th>Cambiar</th></tr></thead><tbody>`;
             data.users.forEach(u => {
+                const escapedName = (u.name || '').replace(/'/g, "\\'");
                 html += `<tr>
                     <td>${u.name}</td><td>${u.email}</td>
                     <td><span class="badge-role ${u.role}">${u.role}</span></td>
                     <td>${u.grade ? u.grade + '° ' + (u.group_code || '') : '—'}</td>
                     <td>
-                        <select onchange="changeRole(${u.id}, this.value)" style="font-size:0.8rem;padding:4px;">
+                        <select onchange="changeRole(${u.id}, this.value, '${escapedName}')" style="font-size:0.8rem;padding:4px;">
                             <option value="">—</option>
                             <option value="student" ${u.role==='student'?'selected':''}>student</option>
                             <option value="teacher" ${u.role==='teacher'?'selected':''}>teacher</option>
@@ -444,13 +445,17 @@
             el.innerHTML = html;
         };
 
-        window.changeRole = async (userId, newRole) => {
+        window.changeRole = async (userId, newRole, userName) => {
             if (!newRole) return;
             if (!confirm(`¿Cambiar rol a "${newRole}"?`)) return;
             const data = await api('set_role', 'POST', { user_id: userId, role: newRole });
             alert(data.message || 'Hecho');
             loadUsers();
             loadTeachers();
+            // Si el nuevo rol es maestro, abrir modal para asignar materia
+            if (newRole === 'teacher') {
+                openAssign(userId, userName || 'Maestro');
+            }
         };
 
         // --- Asignar materia ---
