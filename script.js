@@ -138,6 +138,7 @@ const isAuthenticated = () => {
 
 			const actions = header.querySelector('.nav-actions');
 			if (actions && actionsHost) {
+				actionsHost.classList.toggle('is-guest', !document.body.classList.contains('is-auth'));
 				actionsHost.innerHTML = actions.innerHTML;
 				actionsHost.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => closeMenu()));
 			}

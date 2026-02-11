@@ -486,6 +486,21 @@ footer {
 		width: 100%;
 		justify-content: center;
 	}
+
+	/* En modo invitado (no-auth): botones más chicos y en fila */
+	body.js-nav .mobile-nav-actions.is-guest {
+		flex-direction: row;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	body.js-nav .mobile-nav-actions.is-guest .btn {
+		width: auto;
+		flex: 1 1 140px;
+		padding: 7px 12px;
+		font-size: 0.78rem;
+		letter-spacing: 0.5px;
+	}
 }
 
 /* --- LOGIN PAGE --- */
