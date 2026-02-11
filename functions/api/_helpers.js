@@ -38,40 +38,45 @@ export const ensureSchema = async (DB) => {
 	try { await DB.prepare('ALTER TABLE users ADD COLUMN group_code TEXT').run(); } catch {}
 	try { await DB.prepare('ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT \'student\'').run(); } catch {}
 
-	await DB.exec(`
-		CREATE TABLE IF NOT EXISTS teacher_profiles (
-			user_id INTEGER PRIMARY KEY,
-			bio TEXT,
-			photo_url TEXT,
-			office_hours TEXT,
-			FOREIGN KEY (user_id) REFERENCES users(id)
-		);
-		CREATE TABLE IF NOT EXISTS teacher_subjects (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			teacher_id INTEGER NOT NULL,
-			subject_slug TEXT NOT NULL,
-			grade INTEGER NOT NULL,
-			group_code TEXT,
 			FOREIGN KEY (teacher_id) REFERENCES users(id),
-			UNIQUE(teacher_id, subject_slug, grade, group_code)
-		);
-		CREATE INDEX IF NOT EXISTS idx_teacher_subjects_teacher ON teacher_subjects(teacher_id);
-		CREATE INDEX IF NOT EXISTS idx_teacher_subjects_subject ON teacher_subjects(subject_slug, grade, group_code);
-		CREATE TABLE IF NOT EXISTS invitations (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			token TEXT NOT NULL UNIQUE,
-			email TEXT NOT NULL,
-			role TEXT NOT NULL DEFAULT 'teacher',
-			created_by INTEGER NOT NULL,
-			expires_at TEXT NOT NULL,
-			used_at TEXT,
-			subject_slug TEXT,
-			subject_grade INTEGER,
-			subject_group TEXT,
-			FOREIGN KEY (created_by) REFERENCES users(id)
-		);
-		CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token);
-	`);
+	await DB.prepare(`CREATE TABLE IF NOT EXISTS teacher_profiles (
+		user_id INTEGER PRIMARY KEY,
+		bio TEXT,
+		photo_url TEXT,
+		office_hours TEXT,
+		FOREIGN KEY (user_id) REFERENCES users(id)
+	)`).run();
+
+	await DB.prepare(`CREATE TABLE IF NOT EXISTS teacher_subjects (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		teacher_id INTEGER NOT NULL,
+		subject_slug TEXT NOT NULL,
+		grade INTEGER NOT NULL,
+		group_code TEXT,
+		FOREIGN KEY (teacher_id) REFERENCES users(id),
+		UNIQUE(teacher_id, subject_slug, grade, group_code)
+	)`).run();
+
+	try { await DB.prepare('CREATE INDEX IF NOT EXISTS idx_teacher_subjects_teacher ON teacher_subjects(teacher_id)').run(); } catch {}
+	try { await DB.prepare('CREATE INDEX IF NOT EXISTS idx_teacher_subjects_subject ON teacher_subjects(subject_slug, grade, group_code)').run(); } catch {}
+
+	// Crear tabla invitations
+	await DB.prepare(`CREATE TABLE IF NOT EXISTS invitations (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		token TEXT NOT NULL UNIQUE,
+		email TEXT NOT NULL,
+		role TEXT NOT NULL DEFAULT 'teacher',
+		created_by INTEGER NOT NULL,
+		expires_at TEXT NOT NULL,
+		used_at TEXT,
+		subject_slug TEXT,
+		subject_grade INTEGER,
+		subject_group TEXT,
+		FOREIGN KEY (created_by) REFERENCES users(id)
+	)`).run();
+	try { await DB.prepare('CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token)').run(); } catch {}
+
+	// Migraciones suaves
 	try { await DB.prepare('ALTER TABLE tasks ADD COLUMN teacher_id INTEGER').run(); } catch {}
 	try { await DB.prepare('ALTER TABLE invitations ADD COLUMN subject_slug TEXT').run(); } catch {}
 	try { await DB.prepare('ALTER TABLE invitations ADD COLUMN subject_grade INTEGER').run(); } catch {}

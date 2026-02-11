@@ -2,6 +2,7 @@
 import { jsonResponse, hashPassword, toHex, generateToken, ensureSchema, requireRole } from './_helpers.js';
 
 export async function onRequest({ request, env }) {
+	try {
 	if (!env.DB) return jsonResponse(500, { message: 'Base de datos no configurada.' });
 	await ensureSchema(env.DB);
 
@@ -129,4 +130,7 @@ export async function onRequest({ request, env }) {
 	}
 
 	return jsonResponse(405, { message: 'Método no permitido.' });
+	} catch (err) {
+		return jsonResponse(500, { message: 'Error interno del servidor.', detail: String(err) });
+	}
 }
