@@ -1,5 +1,5 @@
 // Teacher: crear tareas, ver entregas, calificar
-import { jsonResponse, ensureSchema, requireRole } from '../_helpers.js';
+import { jsonResponse, ensureSchema, requireRole } from './_helpers.js';
 
 export async function onRequest({ request, env }) {
 	if (!env.DB) return jsonResponse(500, { message: 'Base de datos no configurada.' });

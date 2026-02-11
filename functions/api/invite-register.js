@@ -1,5 +1,5 @@
 // Registro por invitación (para maestros)
-import { jsonResponse, hashPassword, toHex, ensureSchema } from '../_helpers.js';
+import { jsonResponse, hashPassword, toHex, ensureSchema } from './_helpers.js';
 
 export async function onRequestPost({ request, env }) {
 	if (!env.DB) return jsonResponse(500, { message: 'Base de datos no configurada.' });

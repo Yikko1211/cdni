@@ -1,5 +1,5 @@
 // Admin: gestionar maestros, invitaciones, usuarios
-import { jsonResponse, hashPassword, toHex, generateToken, ensureSchema, requireRole } from '../_helpers.js';
+import { jsonResponse, hashPassword, toHex, generateToken, ensureSchema, requireRole } from './_helpers.js';
 
 export async function onRequest({ request, env }) {
 	if (!env.DB) return jsonResponse(500, { message: 'Base de datos no configurada.' });
