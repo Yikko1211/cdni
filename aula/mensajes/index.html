@@ -14,6 +14,41 @@
         .module p { color: #555; }
         .module-card { background: var(--white); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); padding: 22px; margin-top: 18px; }
         .module-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+        /* Compose form */
+        .compose-form { display: none; }
+        .compose-form.visible { display: block; }
+        .compose-form label { display: block; font-weight: 600; margin-top: 14px; color: #333; font-size: .95rem; }
+        .compose-form input, .compose-form textarea, .compose-form select {
+            width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px;
+            font-family: inherit; font-size: .95rem; margin-top: 4px; box-sizing: border-box;
+        }
+        .compose-form textarea { min-height: 120px; resize: vertical; }
+        .compose-form .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .compose-form .form-row > * { flex: 1; min-width: 120px; }
+        .compose-actions { display: flex; gap: 10px; margin-top: 18px; }
+
+        /* Message list */
+        .msg-list { list-style: none; padding: 0; margin: 0; }
+        .msg-item { border-bottom: 1px solid #eee; padding: 16px 0; cursor: pointer; transition: background .15s; }
+        .msg-item:hover { background: #f9f9f9; }
+        .msg-item.unread .msg-subject { font-weight: 700; }
+        .msg-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .msg-subject { font-size: 1.05rem; color: var(--primary); }
+        .msg-meta { font-size: .82rem; color: #888; }
+        .msg-sender { font-size: .88rem; color: #555; margin-top: 2px; }
+        .msg-target-badge { display: inline-block; font-size: .75rem; background: #e0e7ff; color: #3b5bdb; border-radius: 6px; padding: 2px 8px; margin-left: 6px; }
+        .msg-body-preview { font-size: .9rem; color: #666; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 600px; }
+        .msg-body-full { display: none; font-size: .93rem; color: #333; margin-top: 10px; white-space: pre-wrap; line-height: 1.6; }
+        .msg-item.expanded .msg-body-full { display: block; }
+        .msg-item.expanded .msg-body-preview { display: none; }
+        .msg-delete { background: none; border: none; color: #e03131; cursor: pointer; font-size: .85rem; padding: 4px 8px; border-radius: 6px; }
+        .msg-delete:hover { background: #fff0f0; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #888; }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 10px; display: block; color: #ccc; }
+        .status-msg { padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: .9rem; }
+        .status-msg.success { background: #d3f9d8; color: #2b8a3e; }
+        .status-msg.error { background: #ffe0e0; color: #c92a2a; }
     </style>
 </head>
 <body class="aula-page is-auth">
@@ -37,14 +72,266 @@
         <p id="welcomeUser" style="margin-top: 6px;"></p>
 
         <div class="module-card">
-            <p>Aquí podrás ver mensajes y comunicación con docentes. (Placeholder)</p>
-            <div class="module-actions">
-                <a class="btn" href="/aula">Volver al Aula</a>
-                <a class="btn btn-outline" href="/">Volver al Inicio</a>
+            <div class="module-actions" style="margin-top:0; margin-bottom: 12px;">
+                <button class="btn" id="btnCompose" style="display:none;">
+                    <i class="fas fa-pen"></i> Nuevo Mensaje
+                </button>
+                <a class="btn btn-outline" href="/aula">Volver al Aula</a>
             </div>
+
+            <!-- Formulario de redacción (solo admin/teacher) -->
+            <div class="compose-form module-card" id="composeForm" style="background:#f8faff; border:1px solid #d0d7ff;">
+                <h3 style="margin:0 0 4px; color:var(--primary); font-size:1.1rem;">
+                    <i class="fas fa-paper-plane" style="margin-right:6px;"></i>Enviar mensaje
+                </h3>
+                <div id="composeStatus"></div>
+                <label for="msgSubject">Asunto *</label>
+                <input type="text" id="msgSubject" placeholder="Asunto del mensaje" maxlength="200">
+
+                <label for="msgBody">Mensaje *</label>
+                <textarea id="msgBody" placeholder="Escribe tu mensaje aquí..."></textarea>
+
+                <label for="msgTarget">Destinatarios</label>
+                <div class="form-row">
+                    <div>
+                        <select id="msgTarget">
+                            <option value="all">Todos los estudiantes</option>
+                            <option value="grade">Por grado</option>
+                            <option value="group">Por grado y grupo</option>
+                            <option value="user">Estudiante específico</option>
+                        </select>
+                    </div>
+                    <div id="targetGradeWrap" style="display:none;">
+                        <select id="msgTargetGrade">
+                            <option value="">Grado...</option>
+                            <option value="1">1°</option>
+                            <option value="2">2°</option>
+                            <option value="3">3°</option>
+                            <option value="4">4°</option>
+                            <option value="5">5°</option>
+                            <option value="6">6°</option>
+                        </select>
+                    </div>
+                    <div id="targetGroupWrap" style="display:none;">
+                        <select id="msgTargetGroup">
+                            <option value="">Grupo...</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                    <div id="targetUserWrap" style="display:none;">
+                        <select id="msgTargetUser">
+                            <option value="">Seleccionar estudiante...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="compose-actions">
+                    <button class="btn" id="btnSend"><i class="fas fa-paper-plane"></i> Enviar</button>
+                    <button class="btn btn-outline" id="btnCancelCompose">Cancelar</button>
+                </div>
+            </div>
+
+            <!-- Lista de mensajes -->
+            <div id="msgStatus"></div>
+            <ul class="msg-list" id="msgList">
+                <li class="empty-state"><i class="fas fa-spinner fa-spin"></i>Cargando mensajes...</li>
+            </ul>
         </div>
     </main>
 
     <script src="/script.js?v=20260211-8"></script>
+    <script>
+    (() => {
+        const $ = (sel) => document.querySelector(sel);
+        const email = (localStorage.getItem('userEmail') || '').trim().toLowerCase();
+        const role = (localStorage.getItem('userRole') || 'student').trim().toLowerCase();
+        const userName = localStorage.getItem('userName') || '';
+        const API = '/api/messages';
+
+        const welcomeEl = $('#welcomeUser');
+        if (welcomeEl) welcomeEl.textContent = `Hola, ${userName || email}`;
+
+        const canCompose = role === 'admin' || role === 'teacher';
+        const btnCompose = $('#btnCompose');
+        const composeForm = $('#composeForm');
+        const msgTarget = $('#msgTarget');
+        const targetGradeWrap = $('#targetGradeWrap');
+        const targetGroupWrap = $('#targetGroupWrap');
+        const targetUserWrap = $('#targetUserWrap');
+
+        // Show compose button for admin/teacher
+        if (canCompose && btnCompose) btnCompose.style.display = '';
+
+        // Toggle compose form
+        btnCompose?.addEventListener('click', () => {
+            composeForm.classList.toggle('visible');
+            if (composeForm.classList.contains('visible') && msgTarget.value === 'user') loadStudents();
+        });
+        $('#btnCancelCompose')?.addEventListener('click', () => composeForm.classList.remove('visible'));
+
+        // Target type toggles
+        msgTarget?.addEventListener('change', () => {
+            const v = msgTarget.value;
+            targetGradeWrap.style.display = (v === 'grade' || v === 'group') ? '' : 'none';
+            targetGroupWrap.style.display = v === 'group' ? '' : 'none';
+            targetUserWrap.style.display = v === 'user' ? '' : 'none';
+            if (v === 'user') loadStudents();
+            // Teachers can't send to "all"
+            if (role === 'teacher' && v === 'all') {
+                showStatus('composeStatus', 'Solo administradores pueden enviar a todos.', 'error');
+            } else {
+                $('#composeStatus').innerHTML = '';
+            }
+        });
+
+        async function loadStudents() {
+            try {
+                const r = await fetch(`/api/admin?action=students&admin_email=${encodeURIComponent(email)}`);
+                if (!r.ok) return;
+                const d = await r.json();
+                const sel = $('#msgTargetUser');
+                sel.innerHTML = '<option value="">Seleccionar estudiante...</option>';
+                (d.students || []).forEach(s => {
+                    const o = document.createElement('option');
+                    o.value = s.id;
+                    o.textContent = `${s.name} (${s.email}) — ${s.grade || '?'}° ${s.group_code || ''}`;
+                    sel.appendChild(o);
+                });
+            } catch {}
+        }
+
+        // Send message
+        $('#btnSend')?.addEventListener('click', async () => {
+            const subject = ($('#msgSubject')?.value || '').trim();
+            const body = ($('#msgBody')?.value || '').trim();
+            const targetType = msgTarget.value;
+            const targetGrade = $('#msgTargetGrade')?.value || null;
+            const targetGroup = $('#msgTargetGroup')?.value || null;
+            const targetUserId = $('#msgTargetUser')?.value || null;
+
+            if (!subject || !body) return showStatus('composeStatus', 'Asunto y mensaje son obligatorios.', 'error');
+
+            const payload = { subject, body, target_type: targetType };
+            if (targetType === 'grade' || targetType === 'group') payload.target_grade = targetGrade;
+            if (targetType === 'group') payload.target_group = targetGroup;
+            if (targetType === 'user') payload.target_user_id = targetUserId;
+
+            try {
+                const r = await fetch(`${API}?action=send&email=${encodeURIComponent(email)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const d = await r.json();
+                if (r.ok) {
+                    showStatus('composeStatus', '¡Mensaje enviado!', 'success');
+                    $('#msgSubject').value = '';
+                    $('#msgBody').value = '';
+                    setTimeout(() => { composeForm.classList.remove('visible'); loadMessages(); }, 1200);
+                } else {
+                    showStatus('composeStatus', d.message || 'Error al enviar.', 'error');
+                }
+            } catch (e) {
+                showStatus('composeStatus', 'Error de conexión.', 'error');
+            }
+        });
+
+        function showStatus(id, text, type) {
+            const el = $(`#${id}`);
+            if (!el) return;
+            el.innerHTML = `<div class="status-msg ${type}">${text}</div>`;
+            if (type === 'success') setTimeout(() => el.innerHTML = '', 4000);
+        }
+
+        function formatDate(val) {
+            if (!val) return '';
+            const iso = val.includes('T') ? val : val.replace(' ', 'T') + 'Z';
+            const d = new Date(iso);
+            if (isNaN(d.getTime())) return val;
+            return d.toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short' });
+        }
+
+        function targetLabel(msg) {
+            if (msg.target_type === 'all') return 'Todos';
+            if (msg.target_type === 'grade') return `${msg.target_grade}° grado`;
+            if (msg.target_type === 'group') return `${msg.target_grade}°${msg.target_group}`;
+            if (msg.target_type === 'user') return 'Directo';
+            return msg.target_type;
+        }
+
+        async function loadMessages() {
+            const list = $('#msgList');
+            try {
+                const r = await fetch(`${API}?email=${encodeURIComponent(email)}`);
+                if (!r.ok) { list.innerHTML = '<li class="empty-state"><i class="fas fa-exclamation-circle"></i>Error al cargar mensajes.</li>'; return; }
+                const d = await r.json();
+                const msgs = d.messages || [];
+                if (!msgs.length) {
+                    list.innerHTML = '<li class="empty-state"><i class="fas fa-inbox"></i>No hay mensajes aún.</li>';
+                    return;
+                }
+                list.innerHTML = msgs.map(m => `
+                    <li class="msg-item ${m.is_read ? '' : 'unread'}" data-id="${m.id}">
+                        <div class="msg-header">
+                            <span class="msg-subject">${esc(m.subject)}</span>
+                            <span class="msg-meta">${formatDate(m.created_at)}</span>
+                        </div>
+                        <div class="msg-sender">
+                            <i class="fas fa-user-circle" style="margin-right:4px;"></i>${esc(m.sender_name || 'Desconocido')}
+                            <span class="msg-target-badge">${targetLabel(m)}</span>
+                        </div>
+                        <div class="msg-body-preview">${esc(m.body)}</div>
+                        <div class="msg-body-full">${esc(m.body)}
+                            ${canCompose ? `<br><button class="msg-delete" data-msgid="${m.id}"><i class="fas fa-trash"></i> Eliminar</button>` : ''}
+                        </div>
+                    </li>
+                `).join('');
+
+                // Expand/collapse + mark read
+                list.querySelectorAll('.msg-item').forEach(li => {
+                    li.addEventListener('click', (e) => {
+                        if (e.target.closest('.msg-delete')) return;
+                        li.classList.toggle('expanded');
+                        if (li.classList.contains('expanded') && li.classList.contains('unread')) {
+                            li.classList.remove('unread');
+                            fetch(`${API}?action=mark_read&message_id=${li.dataset.id}&email=${encodeURIComponent(email)}`).catch(() => {});
+                        }
+                    });
+                });
+
+                // Delete buttons
+                list.querySelectorAll('.msg-delete').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        if (!confirm('¿Eliminar este mensaje?')) return;
+                        const msgId = btn.dataset.msgid;
+                        try {
+                            const r = await fetch(`${API}?action=delete&email=${encodeURIComponent(email)}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ message_id: Number(msgId) })
+                            });
+                            if (r.ok) loadMessages();
+                            else { const d = await r.json(); alert(d.message || 'Error'); }
+                        } catch { alert('Error de conexión.'); }
+                    });
+                });
+            } catch {
+                list.innerHTML = '<li class="empty-state"><i class="fas fa-exclamation-circle"></i>Error de conexión.</li>';
+            }
+        }
+
+        function esc(s) {
+            const d = document.createElement('div');
+            d.textContent = s || '';
+            return d.innerHTML;
+        }
+
+        loadMessages();
+    })();
+    </script>
 </body>
 </html>
