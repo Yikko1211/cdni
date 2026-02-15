@@ -117,6 +117,20 @@ export async function onRequest({ request, env }) {
 			return jsonResponse(200, { message: `${subjects.length} materia(s) asignadas.` });
 		}
 
+		if (action === 'delete_user') {
+			const userId = Number(body.user_id);
+			if (!userId) return jsonResponse(400, { message: 'user_id requerido.' });
+			if (userId === admin.id) return jsonResponse(400, { message: 'No puedes eliminar tu propia cuenta.' });
+			// Eliminar todo lo relacionado al usuario
+			await env.DB.prepare('DELETE FROM teacher_subjects WHERE teacher_id = ?').bind(userId).run();
+			await env.DB.prepare('DELETE FROM teacher_profiles WHERE user_id = ?').bind(userId).run();
+			await env.DB.prepare('DELETE FROM message_reads WHERE user_id = ?').bind(userId).run();
+			await env.DB.prepare('DELETE FROM messages WHERE sender_id = ?').bind(userId).run();
+			await env.DB.prepare('DELETE FROM submissions WHERE user_email = (SELECT email FROM users WHERE id = ?)').bind(userId).run();
+			await env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId).run();
+			return jsonResponse(200, { message: 'Cuenta eliminada completamente.' });
+		}
+
 		if (action === 'set_role') {
 			const userId = Number(body.user_id);
 			const newRole = body.role;
