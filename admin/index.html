@@ -324,8 +324,10 @@
             const el = document.getElementById('allUsersList');
             const data = await api('all_users');
             if (!data.users || data.users.length === 0) { el.innerHTML = '<p style="color:#888;">Sin usuarios.</p>'; return; }
+            const filtered = data.users.filter(u => u.email !== email());
+            if (filtered.length === 0) { el.innerHTML = '<p style="color:#888;">Sin usuarios.</p>'; return; }
             let html = `<table class="admin-table"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Grado</th><th>Cambiar</th></tr></thead><tbody>`;
-            data.users.forEach(u => {
+            filtered.forEach(u => {
                 const escapedName = (u.name || '').replace(/'/g, "\\'");
                 html += `<tr>
                     <td>${u.name}</td><td>${u.email}</td>
