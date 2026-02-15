@@ -117,6 +117,18 @@ export async function onRequest({ request, env }) {
 			return jsonResponse(200, { message: `${subjects.length} materia(s) asignadas.` });
 		}
 
+		if (action === 'advance_grades') {
+			// Estudiantes de 6° → quitar grado (egresados)
+			await env.DB.prepare(
+				`UPDATE users SET grade = NULL, group_code = NULL WHERE role = 'student' AND grade = 6`
+			).run();
+			// Estudiantes de 1-5 → avanzar un grado
+			await env.DB.prepare(
+				`UPDATE users SET grade = grade + 1 WHERE role = 'student' AND grade IS NOT NULL AND grade >= 1 AND grade <= 5`
+			).run();
+			return jsonResponse(200, { message: 'Todos los estudiantes avanzaron un grado. Los de 6° ahora son egresados.' });
+		}
+
 		if (action === 'delete_user') {
 			const userId = Number(body.user_id);
 			if (!userId) return jsonResponse(400, { message: 'user_id requerido.' });

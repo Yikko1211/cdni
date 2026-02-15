@@ -125,7 +125,12 @@
     <!-- ===== TAB: USUARIOS ===== -->
     <section class="admin-section" id="tab-users">
         <div class="admin-card">
-            <h3><i class="fas fa-users"></i> Todos los usuarios</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+                <h3 style="margin:0;"><i class="fas fa-users"></i> Todos los usuarios</h3>
+                <button class="btn-admin primary" onclick="advanceGrades()" title="Todos los estudiantes avanzan un grado (1→2, 2→3… 6→Egresado)">
+                    <i class="fas fa-arrow-up"></i> Avanzar Grado a Todos
+                </button>
+            </div>
             <div id="allUsersList">Cargando…</div>
         </div>
     </section>
@@ -326,8 +331,52 @@
             if (!data.users || data.users.length === 0) { el.innerHTML = '<p style="color:#888;">Sin usuarios.</p>'; return; }
             const filtered = data.users.filter(u => u.email !== email());
             if (filtered.length === 0) { el.innerHTML = '<p style="color:#888;">Sin usuarios.</p>'; return; }
+
+            // Separar por rol
+            const students = filtered.filter(u => u.role === 'student');
+            const others = filtered.filter(u => u.role !== 'student');
+
+            // Agrupar estudiantes por grado y grupo
+            const groups = {};
+            students.forEach(u => {
+                const g = u.grade || 0;
+                const gr = u.group_code || 'Sin grupo';
+                const key = `${g}|${gr}`;
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(u);
+            });
+            // Ordenar claves: por grado, luego grupo
+            const sortedKeys = Object.keys(groups).sort((a, b) => {
+                const [gA, grA] = a.split('|');
+                const [gB, grB] = b.split('|');
+                return (Number(gA) - Number(gB)) || grA.localeCompare(grB);
+            });
+
+            let html = '';
+
+            // Maestros y admins primero
+            if (others.length) {
+                html += `<h4 style="color:var(--primary); margin:16px 0 8px;"><i class="fas fa-user-shield"></i> Maestros y Admins</h4>`;
+                html += userTable(others);
+            }
+
+            // Estudiantes agrupados
+            if (sortedKeys.length) {
+                sortedKeys.forEach(key => {
+                    const [g, gr] = key.split('|');
+                    const label = Number(g) ? `${g}° Grado — Grupo ${gr}` : `Sin grado — ${gr}`;
+                    html += `<h4 style="color:var(--primary); margin:20px 0 8px;"><i class="fas fa-graduation-cap"></i> ${label} <span style="font-weight:400; color:#888; font-size:0.85rem;">(${groups[key].length})</span></h4>`;
+                    html += userTable(groups[key]);
+                });
+            }
+
+            if (!html) html = '<p style="color:#888;">Sin usuarios.</p>';
+            el.innerHTML = html;
+        };
+
+        const userTable = (users) => {
             let html = `<table class="admin-table"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Grado</th><th>Cambiar</th><th>Remover</th></tr></thead><tbody>`;
-            filtered.forEach(u => {
+            users.forEach(u => {
                 const escapedName = (u.name || '').replace(/'/g, "\\'");
                 html += `<tr>
                     <td>${u.name}</td><td>${u.email}</td>
@@ -344,7 +393,14 @@
                     <td><button class="btn-admin danger small" onclick="deleteUser(${u.id}, '${escapedName}')" title="Eliminar cuenta"><i class="fas fa-trash"></i></button></td></tr>`;
             });
             html += '</tbody></table>';
-            el.innerHTML = html;
+            return html;
+        };
+
+        window.advanceGrades = async () => {
+            if (!confirm('¿Avanzar a TODOS los estudiantes un grado?\n\n• 1° → 2°\n• 2° → 3°\n• 3° → 4°\n• 4° → 5°\n• 5° → 6°\n• 6° → Egresado (se elimina grado)\n\nEsta acción no se puede deshacer.')) return;
+            const data = await api('advance_grades', 'POST', {});
+            alert(data.message || 'Grados actualizados.');
+            loadUsers();
         };
 
         window.deleteUser = async (userId, userName) => {
