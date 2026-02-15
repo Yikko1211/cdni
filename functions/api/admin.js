@@ -117,6 +117,21 @@ export async function onRequest({ request, env }) {
 			return jsonResponse(200, { message: `${subjects.length} materia(s) asignadas.` });
 		}
 
+		if (action === 'delete_graduates') {
+			// Obtener IDs de egresados (estudiantes sin grado)
+			const grads = await env.DB.prepare(
+				`SELECT id, email FROM users WHERE role = 'student' AND grade IS NULL`
+			).all();
+			const ids = (grads?.results || []).map(u => u.id);
+			if (ids.length === 0) return jsonResponse(200, { message: 'No hay egresados para eliminar.' });
+			for (const id of ids) {
+				await env.DB.prepare('DELETE FROM message_reads WHERE user_id = ?').bind(id).run();
+				await env.DB.prepare('DELETE FROM submissions WHERE user_email = (SELECT email FROM users WHERE id = ?)').bind(id).run();
+				await env.DB.prepare('DELETE FROM users WHERE id = ?').bind(id).run();
+			}
+			return jsonResponse(200, { message: `${ids.length} egresado(s) eliminados.` });
+		}
+
 		if (action === 'advance_grades') {
 			// Estudiantes de 6° → quitar grado (egresados)
 			await env.DB.prepare(
