@@ -326,11 +326,11 @@
             if (!data.users || data.users.length === 0) { el.innerHTML = '<p style="color:#888;">Sin usuarios.</p>'; return; }
             const filtered = data.users.filter(u => u.email !== email());
             if (filtered.length === 0) { el.innerHTML = '<p style="color:#888;">Sin usuarios.</p>'; return; }
-            let html = `<table class="admin-table"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Grado</th><th>Cambiar</th></tr></thead><tbody>`;
+            let html = `<table class="admin-table"><thead><tr><th>Email</th><th>Rol</th><th>Grado</th><th>Cambiar</th></tr></thead><tbody>`;
             filtered.forEach(u => {
                 const escapedName = (u.name || '').replace(/'/g, "\\'");
                 html += `<tr>
-                    <td>${u.name}</td><td>${u.email}</td>
+                    <td>${u.email}</td>
                     <td><span class="badge-role ${u.role}">${u.role}</span></td>
                     <td>${u.grade ? u.grade + '° ' + (u.group_code || '') : '—'}</td>
                     <td>
