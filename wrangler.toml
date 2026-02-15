@@ -9,3 +9,8 @@ pages_build_output_dir = "."
 binding = "DB"
 database_name = "prepa_db"
 database_id = "b83d03f2-0f13-4404-8e6a-cd2b697446df"
+
+# R2 Bucket para archivos (imágenes, videos, PDFs)
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "cdni-files"
